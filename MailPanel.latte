@@ -1,0 +1,56 @@
+<style>
+	ul.mails li {
+		margin-left: 10px !important;
+		margin-bottom: 5px !important;
+	}
+	ul.mails {
+		padding: 10px !important;
+	}
+	ul.mails strong {
+		font-weight: bold !important;
+	}
+	#nette-debug-panel-MailPanel {
+		text-align: left;
+		overflow: auto;
+		max-height: 800px;
+	}
+	iframe.mail-body {
+		border: 1px solid #A7A7A7 !important;
+		padding: 10px !important;
+		background: #EFEFEF !important;
+		width: 500px;
+		height: auto;
+	}
+</style>
+
+<h1>Sent mails</h1>
+{if count($data) > 0}
+	<p>Last sent mails. Latest at top.</p>
+	<ul class="mails">
+	{* Get newest at top *}
+	{var topListing => array_reverse($data->getIterator()->getArrayCopy(),true)}
+	{foreach $topListing as $mail}
+		{* Skip hidden messages or nonvalid *}
+		{continueIf $iterator->getCounter() > $count}
+		{continueIf ! $mail instanceOf Mail}
+		<li><strong>{$mail->getSubject()}</strong> &ndash; <a href="/mail-panel/delete/{$iterator->key()}/">Delete</a><br />
+			{var headers => $mail->getHeaders()}
+			<p><em>To: </em>
+			{foreach $headers["To"] as $key => $value}
+				<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+			{/foreach}
+			</p>
+			<p><em>From: </em>
+			{foreach $headers["From"] as $key => $value}
+				<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+			{/foreach}
+			</p>
+			<iframe class="mail-body" src="/mail-panel/detail/{$iterator->key()}"></iframe>
+		</li>
+	{/foreach}
+	</ul>
+	{* Controls *}
+	<p><a href="/mail-panel/show-less/3">Show less</a> | Showing max: {$count} | <a href="/mail-panel/show-more/3">Show more</a> | <a href="/mail-panel/delete-all">Delete all</a></p>
+{else}
+	<p>No mails.</p>
+{/if}
