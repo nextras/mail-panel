@@ -46,6 +46,7 @@ class MailPanelPresenter extends Presenter {
 		// Template and rendering
 		$template = new FileTemplate(__DIR__. "/MailPanelDetail.latte");
 		$template->registerFilter(new LatteFilter);
+		$template->registerHelper("nl2br","nl2br");
 		$template->mail = $this->container->queue->offsetGet($id);
 		$template->render();
 		$this->terminate();

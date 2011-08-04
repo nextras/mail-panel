@@ -1,1 +1,15 @@
-{!$mail->getHtmlBody()}
+{var content => $mail->getHtmlBody()}
+{if !empty($content)}
+	{* Has propper <html header *}
+	{if strpos($content,"<html") !== FALSE}
+		{!$content}
+	{else}
+		{include MailPanelHeader.latte, mail => $mail}
+		{!$content}
+		{include MailPanelFooter.latte}	
+	{/if}
+{else}
+	{include MailPanelHeader.latte, mail => $mail}
+	{!$mail->getBody()|nl2br}
+	{include MailPanelFooter.latte}	
+{/if}
