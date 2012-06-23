@@ -1,18 +1,18 @@
+{* Template rendering mail messages sent via SessionDumpMailer.
+ * 
+ * @author Jan Drábek
+ * @licence New BSD
+ *}
+
 <style>
-	ul.mails li {
-		margin-left: 10px !important;
-		margin-bottom: 5px !important;
-	}
-	ul.mails {
-		padding: 10px !important;
-	}
-	ul.mails strong {
-		font-weight: bold !important;
-	}
-	#nette-debug-panel-MailPanel {
+	#nette-debug-panel-JanDrabek-Diagnostics-MailPanel {
 		text-align: left;
 		overflow: auto;
-		max-height: 800px;
+		max-height: 600px;
+	}
+	table.mail-container {
+		margin-bottom: 10px !important;
+		width: 100%;
 	}
 	iframe.mail-body {
 		border: 1px solid #A7A7A7 !important;
@@ -21,36 +21,103 @@
 		width: 500px;
 		height: auto;
 	}
+	a.delete-link {
+		float: right;
+		margin-right: 5px;
+	}
 </style>
-
+{* Prepare header and footer for not complete HTML e-mails *}
+{var $header = "<html><head><title>Sent mail</title><style>body {font-size: 12px; font-family: Arial; color: #555555;}</style></head><body>"}
+{var $footer = "</body></html>"}
+{* Render it *}
 <h1>Sent mails</h1>
 {if count($data) > 0}
 	<p>Last sent mails. Latest at top.</p>
-	<ul class="mails">
+	{*<ul class="mails">*}
 	{* Get newest at top *}
 	{var topListing => array_reverse($data->getIterator()->getArrayCopy(),true)}
 	{foreach $topListing as $mail}
 		{* Skip hidden messages or nonvalid *}
 		{continueIf $iterator->getCounter() > $count}
-		{continueIf ! $mail instanceOf Mail}
-		<li><strong>{$mail->getSubject()}</strong> &ndash; <a href="/mail-panel/delete/{$iterator->key()}/">Delete</a><br />
+		{continueIf ! $mail instanceOf Nette\Mail\Message}
+		{* The message itself *}
+		<table class="mail-container">
+			<tr>
+				<th width="30%"><strong>Subject</strong></th>
+				<td>
+					{$mail->getSubject()}
+					<a class="delete-link" href="/?mail-panel={$iterator->key()}">Delete</a>
+				</td>
+			</tr>
 			{var headers => $mail->getHeaders()}
-			<p><em>To: </em>
-			{foreach $headers["To"] as $key => $value}
-				<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
-			{/foreach}
-			</p>
-			<p><em>From: </em>
-			{foreach $headers["From"] as $key => $value}
-				<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
-			{/foreach}
-			</p>
-			<iframe class="mail-body" src="/mail-panel/detail/{$iterator->key()}"></iframe>
-		</li>
+			<tr>
+				<th>From</th>
+				<td>
+					{if isSet($headers["From"])}
+						{foreach $headers["From"] as $key => $value}
+							<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+						{/foreach}
+					{/if}
+				</td>
+			</tr>
+			<tr>
+				<th>To</th>
+				<td>
+					{if isSet($headers["To"])}
+						{foreach $headers["To"] as $key => $value}
+							<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+						{/foreach}
+					{/if}
+				</td>
+			</tr>
+			{if isSet($headers["Cc"])}
+				<tr>
+					<th>CC</th>
+					<td>
+						{foreach $headers["Cc"] as $key => $value}
+							<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+						{/foreach}
+					</td>
+				</tr>
+			{/if}
+			{if isSet($headers["Bcc"])}
+				<tr>
+					<th>BCC</th>
+					<td>
+						{foreach $headers["Bcc"] as $key => $value}
+							<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+						{/foreach}
+					</td>
+				</tr>
+			{/if}
+			{* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
+			{var $fixPage = FALSE}
+			{var $mailContent = $mail->getHtmlBody()}
+			{if $mailContent == NULL}
+				{var $mailContent = $mail->getBody()}
+				<tr><th colspan="2">Plaintext e-mail</th></tr>
+			{else}
+				{if strpos($mailContent,"<html") === FALSE}
+					{var $fixPage = TRUE}
+				{/if}
+				<tr><th colspan="2">HTML e-mail</th></tr>
+			{/if}
+			{var $mailContent = str_replace("'","&apos;",$mailContent)}
+			
+			<tr>
+				<td colspan="2">
+					<iframe class="mail-body" id="mail-body-{$iterator->key()}"></iframe>
+					<script type="text/javascript">
+						
+						document.getElementById('mail-body-{$iterator->key()}').contentWindow.document.write('{if $fixPage}{!$header}{/if}{!$mailContent}{if $fixPage}{!$footer}{/if}');
+					</script>
+				</td>
+			</tr>
+		</table>
 	{/foreach}
-	</ul>
-	{* Controls *}
-	<p><a href="/mail-panel/show-less/3">Show less</a> | Showing max: {$count} | <a href="/mail-panel/show-more/3">Show more</a> | <a href="/mail-panel/delete-all">Delete all</a></p>
+	{*</ul>*}
+	{* Show controls *}
+	<p><a href="/?mail-panel=less">Show less</a> | Showing max: {$count} | <a href="/?mail-panel=more">Show more</a> | <a href="/?mail-panel=delete">Delete all</a></p>
 {else}
 	<p>No mails.</p>
 {/if}
