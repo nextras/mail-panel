@@ -6,7 +6,7 @@
  * @version 2.0
  * @copyright New BSD
  */
-namespace JanDrabek\Diagnostics;
+namespace JanDrabek\MailPanel;
 use Nette;
 
 class SessionDumpMailer implements Nette\Mail\IMailer {

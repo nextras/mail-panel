@@ -5,7 +5,7 @@
  *}
 
 <style>
-	#nette-debug-panel-JanDrabek-Diagnostics-MailPanel {
+	#nette-debug-panel-JanDrabek-MailPanel-MailPanel {
 		text-align: left;
 		overflow: auto;
 		max-height: 600px;
@@ -26,9 +26,11 @@
 		margin-right: 5px;
 	}
 </style>
+
 {* Prepare header and footer for not complete HTML e-mails *}
 {var $header = "<html><head><title>Sent mail</title><style>body {font-size: 12px; font-family: Arial; color: #555555;}</style></head><body>"}
 {var $footer = "</body></html>"}
+
 {* Render it *}
 <h1>Sent mails</h1>
 {if count($data) > 0}
@@ -103,6 +105,9 @@
 				<tr><th colspan="2">HTML e-mail</th></tr>
 			{/if}
 			{var $mailContent = str_replace("'","&apos;",$mailContent)}
+			{var $mailContent = str_replace("\n","",$mailContent)}
+			{var $mailContent = str_replace("\t","",$mailContent)}
+			{var $mailContent = str_replace("\r","",$mailContent)}
 			
 			<tr>
 				<td colspan="2">
@@ -115,7 +120,7 @@
 			</tr>
 		</table>
 	{/foreach}
-	{*</ul>*}
+
 	{* Show controls *}
 	<p><a href="/?mail-panel=less">Show less</a> | Showing max: {$count} | <a href="/?mail-panel=more">Show more</a> | <a href="/?mail-panel=delete">Delete all</a></p>
 {else}

@@ -1,13 +1,13 @@
 <?php
 /**
- * Extension for Debugger bar which shows sent e-mails
+ * Extension for Nette debugger bar which shows sent e-mails
  * 
  * @author Jan Drábek
  * @version 2.0
  * @copyright New BSD
  */
 
-namespace JanDrabek\Diagnostics;
+namespace JanDrabek\MailPanel;
 use Nette;
 
 class MailPanel extends Nette\Application\UI\Control implements Nette\Diagnostics\IBarPanel {
