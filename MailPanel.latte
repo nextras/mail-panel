@@ -35,7 +35,8 @@
 <h1>Sent mails</h1>
 {if count($data) > 0}
 	<p>Last sent mails. Latest at top.</p>
-	{*<ul class="mails">*}
+	{* Show controls *}
+	<p><a href="/?mail-panel=less">Show less</a> | Showing max: {$count} | <a href="/?mail-panel=more">Show more</a> | <a href="/?mail-panel=delete">Delete all</a></p>
 	{* Get newest at top *}
 	{var topListing => array_reverse($data->getIterator()->getArrayCopy(),true)}
 	{foreach $topListing as $mail}
@@ -120,9 +121,6 @@
 			</tr>
 		</table>
 	{/foreach}
-
-	{* Show controls *}
-	<p><a href="/?mail-panel=less">Show less</a> | Showing max: {$count} | <a href="/?mail-panel=more">Show more</a> | <a href="/?mail-panel=delete">Delete all</a></p>
 {else}
 	<p>No mails.</p>
 {/if}
