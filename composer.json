@@ -1,14 +1,17 @@
 {
-	"name": "jandrabek/nette-mailpanel",
+	"name": "nextras/nette-mailpanel",
 	"type": "library",
-	"description": "MailPanel is extension for Nette Framework which captures sent e-mails in development mode and shows them from debugger bar.",
+	"description": "MailPanel is extension for Nette Framework which captures sent e-mails in development mode and shows them in debugger bar.",
 	"keywords": ["framework", "debugging", "mail", "mail panel", "mailpanel", "sessionmailer", "mailing"],
-	"homepage": "http://addons.nette.org/cs/mailpanel",
 	"license": ["BSD-3-Clause"],
 	"authors": [
 		{
 			"name": "Jan Drábek",
 			"homepage": "http://www.jandrabek.cz"
+		},
+		{
+			"name": "Jan Marek",
+			"homepage": "http://www.janmarek.net"
 		}
 	],
 	"require": {

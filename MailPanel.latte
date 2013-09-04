@@ -1,6 +1,7 @@
-{* Template rendering mail messages sent via SessionDumpMailer.
+{**
+ * Template rendering mail messages sent via SessionMailer
  * 
- * @author Jan Drábek
+ * @author Jan Drábek, Jan Marek
  * @licence New BSD
  *}
 
@@ -17,7 +18,7 @@
 	iframe.mail-body {
 		border: 1px solid #A7A7A7 !important;
 		padding: 10px !important;
-		background: #EFEFEF !important;
+		background: #FFF !important;
 		width: 500px;
 		height: auto;
 	}
@@ -31,34 +32,27 @@
 {var $header = "<html><head><title>Sent mail</title><style>body {font-size: 12px; font-family: Arial; color: #555555;}</style></head><body>"}
 {var $footer = "</body></html>"}
 
-{* Render it *}
-<h1>Sent mails</h1>
-{if count($data) > 0}
-	<p>Last sent mails. Latest at top.</p>
-	{* Show controls *}
-	<p><a href="/?mail-panel=less">Show less</a> | Showing max: {$count} | <a href="/?mail-panel=more">Show more</a> | <a href="/?mail-panel=delete">Delete all</a></p>
+<h1>Sent emails</h1>
+{if count($messages) > 0}
+	<p><a href="{$baseUrl}?mail-panel=delete">Delete all</a></p>
 	{* Get newest at top *}
-	{var topListing => array_reverse($data->getIterator()->getArrayCopy(),true)}
-	{foreach $topListing as $mail}
-		{* Skip hidden messages or nonvalid *}
-		{continueIf $iterator->getCounter() > $count}
-		{continueIf ! $mail instanceOf Nette\Mail\Message}
+	{foreach $messages as $index => $mail}
 		{* The message itself *}
 		<table class="mail-container">
 			<tr>
-				<th width="30%"><strong>Subject</strong></th>
+				<th style="width: 30%"><strong>Subject</strong></th>
 				<td>
 					{$mail->getSubject()}
-					<a class="delete-link" href="/?mail-panel={$iterator->key()}">Delete</a>
+					<a class="delete-link" href="{$baseUrl}?mail-panel={$index}">Delete</a>
 				</td>
 			</tr>
 			{var headers => $mail->getHeaders()}
 			<tr>
 				<th>From</th>
 				<td>
-					{if isSet($headers["From"])}
+					{if isset($headers["From"])}
 						{foreach $headers["From"] as $key => $value}
-							<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
 						{/foreach}
 					{/if}
 				</td>
@@ -66,29 +60,29 @@
 			<tr>
 				<th>To</th>
 				<td>
-					{if isSet($headers["To"])}
+					{if isset($headers["To"])}
 						{foreach $headers["To"] as $key => $value}
-							<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
 						{/foreach}
 					{/if}
 				</td>
 			</tr>
-			{if isSet($headers["Cc"])}
+			{if isset($headers["Cc"])}
 				<tr>
 					<th>CC</th>
 					<td>
 						{foreach $headers["Cc"] as $key => $value}
-							<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
 						{/foreach}
 					</td>
 				</tr>
 			{/if}
-			{if isSet($headers["Bcc"])}
+			{if isset($headers["Bcc"])}
 				<tr>
 					<th>BCC</th>
 					<td>
 						{foreach $headers["Bcc"] as $key => $value}
-							<a href="mailto: {$key}">{if isSet($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
 						{/foreach}
 					</td>
 				</tr>
@@ -100,7 +94,7 @@
 				{var $mailContent = $mail->getBody()}
 				<tr><th colspan="2">Plaintext e-mail</th></tr>
 			{else}
-				{if strpos($mailContent,"<html") === FALSE}
+				{if strpos($mailContent, "<html") === FALSE}
 					{var $fixPage = TRUE}
 				{/if}
 				<tr><th colspan="2">HTML e-mail</th></tr>
@@ -112,15 +106,14 @@
 			
 			<tr>
 				<td colspan="2">
-					<iframe class="mail-body" id="mail-body-{$iterator->key()}"></iframe>
+					<iframe class="mail-body" id="mail-body-{$index}"></iframe>
 					<script type="text/javascript">
-						
-						document.getElementById('mail-body-{$iterator->key()}').contentWindow.document.write('{if $fixPage}{!$header}{/if}{!$mailContent}{if $fixPage}{!$footer}{/if}');
+						document.getElementById('mail-body-{$index}').contentWindow.document.write('{if $fixPage}{!$header}{/if}{!$mailContent}{if $fixPage}{!$footer}{/if}');
 					</script>
 				</td>
 			</tr>
 		</table>
 	{/foreach}
 {else}
-	<p>No mails.</p>
+	<p>No emails.</p>
 {/if}
