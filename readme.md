@@ -22,7 +22,7 @@ Session mailer has to be set as service "nette.mailer" in development configurat
 ```
 services:
 	nette.mailer:
-		class: JanDrabek\MailPanel\SessionMailer
+		class: Nextras\MailPanel\SessionMailer
 ```
 
 Add MailPanel to debug bar:
