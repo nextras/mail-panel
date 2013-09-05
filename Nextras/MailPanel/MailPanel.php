@@ -11,7 +11,6 @@ use Nette\Templating\FileTemplate;
  * Extension for Nette debugger bar which shows sent emails
  *
  * @author Jan Drábek, Jan Marek
- * @version 2.0
  * @copyright New BSD
  */
 class MailPanel extends Object implements IBarPanel

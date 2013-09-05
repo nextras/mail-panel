@@ -9,7 +9,6 @@ use Nette\Mail\Message;
  * Session mailer - emails are stored into session
  *
  * @author Jan Drábek, Jan Marek
- * @version 3.0
  * @license New BSD
  */
 class SessionMailer implements \Nette\Mail\IMailer
@@ -39,7 +38,12 @@ class SessionMailer implements \Nette\Mail\IMailer
 			array_pop($mails);
 		}
 
-		array_unshift($mails, $mail);
+		// get message with generated html instead of set FileTemplate etc
+		$reflectionMethod = $mail->getReflection()->getMethod('build');
+		$reflectionMethod->setAccessible(TRUE);
+		$builtMail = $reflectionMethod->invoke($mail);
+
+		array_unshift($mails, $builtMail);
 
 		$this->sessionSection->sentMessages = $mails;
 	}
