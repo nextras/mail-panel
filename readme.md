@@ -53,7 +53,7 @@ class ExamplePresenter extends BasePresenter
 	public function renderDefault()
 	{
 		// recommended way
-		$mail = new \Nette\Mail\Message();
+		$mail = new Nette\Mail\Message();
 		$mail->setFrom('foo@bar.net');
 		$mail->addTo('john@doe.cz');
 		$mail->setSubject('Subject');

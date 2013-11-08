@@ -4,18 +4,21 @@ namespace Nextras\MailPanel;
 
 use Nette\Diagnostics\IBarPanel;
 use Nette\Http\Request;
+use Nette\Latte\Engine;
 use Nette\Object;
 use Nette\Templating\FileTemplate;
+
 
 /**
  * Extension for Nette debugger bar which shows sent emails
  *
- * @author Jan Drábek, Jan Marek
+ * @author Jan Drábek
+ * @author Jan Marek
  * @copyright New BSD
  */
 class MailPanel extends Object implements IBarPanel
 {
-
+	/** @const int */
 	const DEFAULT_COUNT = 5;
 
 	/** @var Request */
@@ -24,7 +27,9 @@ class MailPanel extends Object implements IBarPanel
 	/** @var SessionMailer */
 	private $mailer;
 
+	/** @var int */
 	private $messagesLimit;
+
 
 	public function __construct(Request $request, SessionMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
@@ -41,6 +46,7 @@ class MailPanel extends Object implements IBarPanel
 		}
 	}
 
+
 	/**
 	 * Returns panel ID
 	 * @return string
@@ -49,6 +55,7 @@ class MailPanel extends Object implements IBarPanel
 	{
 		return __CLASS__;
 	}
+
 
 	/**
 	 * Renders HTML code for custom tab
@@ -62,6 +69,7 @@ class MailPanel extends Object implements IBarPanel
 			$count . ' sent email' . ($count === 1 ? '' : 's');
 	}
 
+
 	/**
 	 * Show content of panel
 	 * @return string
@@ -69,7 +77,7 @@ class MailPanel extends Object implements IBarPanel
 	public function getPanel()
 	{
 		$template = new FileTemplate();
-		$template->registerFilter(new \Nette\Latte\Engine());
+		$template->registerFilter(new Engine);
 		$template->setFile(__DIR__ . '/MailPanel.latte');
 		$template->baseUrl = $this->request->getUrl()->getBaseUrl();
 		$template->messages = $this->mailer->getMessages($this->messagesLimit);
@@ -77,17 +85,20 @@ class MailPanel extends Object implements IBarPanel
 		return (string) $template;
 	}
 
+
 	private function returnBack()
 	{
 		header('Location: ' . $this->request->getReferer());
 		exit;
 	}
 
+
 	private function handleDeleteAll()
 	{
 		$this->mailer->clear();
 		$this->returnBack();
 	}
+
 
 	private function handleDelete($id)
 	{

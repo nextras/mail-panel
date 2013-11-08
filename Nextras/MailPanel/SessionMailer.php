@@ -3,21 +3,24 @@
 namespace Nextras\MailPanel;
 
 use Nette\Http\Session;
+use Nette\Http\SessionSection;
+use Nette\Mail\IMailer;
 use Nette\Mail\Message;
+
 
 /**
  * Session mailer - emails are stored into session
  *
- * @author Jan Drábek, Jan Marek
+ * @author Jan Drábek
+ * @author Jan Marek
  * @license New BSD
  */
-class SessionMailer implements \Nette\Mail\IMailer
+class SessionMailer implements IMailer
 {
-
 	/** @var int */
 	private $limit;
 
-	/** @var \Nette\Http\SessionSection */
+	/** @var SessionSection */
 	private $sessionSection;
 
 	public function __construct(Session $session, $limit = 100, $sectionName = __CLASS__)
@@ -25,6 +28,7 @@ class SessionMailer implements \Nette\Mail\IMailer
 		$this->limit = $limit;
 		$this->sessionSection = $session->getSection($sectionName);
 	}
+
 
 	/**
 	 * Sends given message via this mailer
@@ -48,36 +52,40 @@ class SessionMailer implements \Nette\Mail\IMailer
 		$this->sessionSection->sentMessages = $mails;
 	}
 
+
 	public function getMessages($limit = NULL)
 	{
 		$messages = $this->sessionSection->sentMessages ?: array();
-
 		return array_slice($messages, 0, $limit);
 	}
+
 
 	public function getMessageCount()
 	{
 		return count($this->sessionSection->sentMessages);
 	}
 
+
 	public function clear()
 	{
 		$this->sessionSection->sentMessages = array();
 	}
 
+
 	public function deleteByIndex($index)
 	{
 		$messages = $this->sessionSection->sentMessages ?: array();
 		array_splice($messages, (int) $index, 1);
-
 		$this->sessionSection->sentMessages = $messages;
 	}
+
 
 	/**
 	 * Return limit of stored mails
 	 * @return int
 	 */
-	public function getLimit() {
+	public function getLimit()
+	{
 		return $this->limit;
 	}
 
