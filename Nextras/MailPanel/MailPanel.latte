@@ -53,7 +53,7 @@
 				<td>
 					{if isset($headers["From"])}
 						{foreach $headers["From"] as $key => $value}
-							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
 						{/foreach}
 					{/if}
 				</td>
@@ -63,7 +63,7 @@
 				<td>
 					{if isset($headers["To"])}
 						{foreach $headers["To"] as $key => $value}
-							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
 						{/foreach}
 					{/if}
 				</td>
@@ -73,7 +73,7 @@
 					<th>CC</th>
 					<td>
 						{foreach $headers["Cc"] as $key => $value}
-							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
 						{/foreach}
 					</td>
 				</tr>
@@ -83,7 +83,7 @@
 					<th>BCC</th>
 					<td>
 						{foreach $headers["Bcc"] as $key => $value}
-							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{if !$iterator->isLast()}, {/if}
+							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
 						{/foreach}
 					</td>
 				</tr>
