@@ -3,27 +3,27 @@
  *
  * @author Jan Drábek
  * @author Jan Marek
+ * @author Jan Skrasek
  * @licence New BSD
  *}
-
 <style>
-	#nette-debug-panel-Nextras-MailPanel-MailPanel {
+	.nette-panel[id~=MailPanel] {
 		text-align: left;
 		overflow: auto;
 		max-height: 600px;
 	}
-	#nette-debug-panel-Nextras-MailPanel-MailPanel table.mail-container {
+	.nette-panel .mail-container {
 		margin-bottom: 10px !important;
 		width: 540px;
 	}
-	#nette-debug-panel-Nextras-MailPanel-MailPanel iframe.mail-body {
+	.nette-panel .mail-body {
 		border: 1px solid #A7A7A7 !important;
 		padding: 10px !important;
 		background: #FFF !important;
 		width: 100%;
 		height: auto;
 	}
-	#nette-debug-panel-Nextras-MailPanel-MailPanel a.delete-link {
+	.nette-panel a.delete-link {
 		float: right;
 		margin-right: 5px;
 	}
@@ -31,6 +31,7 @@
 
 <h1>Sent emails</h1>
 {if count($messages) > 0}
+	{var $hash = Nette\Utils\Strings::random()}
 	<p><a href="{$baseUrl}?mail-panel=delete">Delete all</a></p>
 	{* Get newest at top *}
 	{foreach $messages as $index => $mail}
@@ -94,10 +95,10 @@
 			{/if}
 			<tr>
 				<td colspan="2">
-					<iframe class="mail-body" id="mail-body-{$index}"></iframe>
+					<iframe class="mail-body" id="mail-body-{$hash}-{$index}"></iframe>
 					<script type="text/javascript">
 						var mailContent = {$mailContent};
-						document.getElementById('mail-body-{$index}').contentWindow.document.write(mailContent);
+						document.getElementById('mail-body-' + {$hash} + '-{$index}').contentWindow.document.write(mailContent);
 					</script>
 				</td>
 			</tr>
