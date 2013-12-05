@@ -45,25 +45,20 @@ class ExamplePresenter extends BasePresenter
 
 	private $mailer;
 
-	public function injectMailer(\Nette\Mail\IMailer $mailer)
+	public function injectMailer(Nette\Mail\IMailer $mailer)
 	{
 		$this->mailer = $mailer;
 	}
 
 	public function renderDefault()
 	{
-		// recommended way
-		$mail = new Nette\Mail\Message();
+		$mail = new Nette\Mail\Message;
 		$mail->setFrom('foo@bar.net');
 		$mail->addTo('john@doe.cz');
 		$mail->setSubject('Subject');
 		$mail->setBody('Message body');
 
 		$this->mailer->send($mail);
-
-		// or
-		// $mail = $this->context->createNette__mail();
-		// $mail->send();
 	}
 
 }
