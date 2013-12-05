@@ -29,10 +29,6 @@
 	}
 </style>
 
-{* Prepare header and footer for not complete HTML e-mails *}
-{var $header = "<html><head><title>Sent mail</title><style>body {font-size: 12px; font-family: Arial; color: #555555;}</style></head><body>"}
-{var $footer = "</body></html>"}
-
 <h1>Sent emails</h1>
 {if count($messages) > 0}
 	<p><a href="{$baseUrl}?mail-panel=delete">Delete all</a></p>
@@ -89,27 +85,19 @@
 				</tr>
 			{/if}
 			{* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
-			{var $fixPage = FALSE}
 			{var $mailContent = $mail->getHtmlBody()}
 			{if $mailContent == NULL}
-				{var $mailContent = $mail->getBody()}
+				{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
 				<tr><th colspan="2">Plaintext e-mail</th></tr>
 			{else}
-				{if strpos($mailContent, "<html") === FALSE}
-					{var $fixPage = TRUE}
-				{/if}
 				<tr><th colspan="2">HTML e-mail</th></tr>
 			{/if}
-			{var $mailContent = str_replace("'","&apos;",$mailContent)}
-			{var $mailContent = str_replace("\n","",$mailContent)}
-			{var $mailContent = str_replace("\t","",$mailContent)}
-			{var $mailContent = str_replace("\r","",$mailContent)}
-
 			<tr>
 				<td colspan="2">
 					<iframe class="mail-body" id="mail-body-{$index}"></iframe>
 					<script type="text/javascript">
-						document.getElementById('mail-body-{$index}').contentWindow.document.write('{if $fixPage}{!$header}{/if}{!$mailContent}{if $fixPage}{!$footer}{/if}');
+						var mailContent = {$mailContent};
+						document.getElementById('mail-body-{$index}').contentWindow.document.write(mailContent);
 					</script>
 				</td>
 			</tr>
