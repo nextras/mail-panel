@@ -12,12 +12,14 @@
 		{
 			"name": "Jan Marek",
 			"homepage": "http://www.janmarek.net"
+		},
+		{
+			"name": "Jan Škrášek",
+			"email": "hrach.cz@gmail.com"
 		}
 	],
 	"autoload": {
-		"psr-0": {
-			"Nextras": ""
-		}
+		"psr-0": { "Nextras\\MailPanel": "" }
 	},
 	"require": {
 		"php": ">=5.3.0",
