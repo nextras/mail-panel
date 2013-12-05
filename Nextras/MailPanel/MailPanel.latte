@@ -25,14 +25,17 @@
 	}
 	.nette-panel a.delete-link {
 		float: right;
-		margin-right: 5px;
+	}
+	.nette-panel a.delete-all-link {
+		float: right;
+		margin: 15px 5px 0 0 !important;
 	}
 </style>
 
+<a n:if="count($messages)" href="{$baseUrl}?mail-panel=delete" class="delete-all-link">Delete all</a>
 <h1>Sent emails</h1>
 {if count($messages) > 0}
 	{var $hash = Nette\Utils\Strings::random()}
-	<p><a href="{$baseUrl}?mail-panel=delete">Delete all</a></p>
 	{* Get newest at top *}
 	{foreach $messages as $index => $mail}
 		{* The message itself *}
