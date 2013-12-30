@@ -18,11 +18,16 @@
 			"email": "hrach.cz@gmail.com"
 		}
 	],
-	"autoload": {
-		"psr-0": { "Nextras\\MailPanel": "" }
-	},
 	"require": {
 		"php": ">=5.3.0",
 		"nette/nette": "~2.0"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.0-dev"
+		}
+	},
+	"autoload": {
+		"psr-0": { "Nextras\\MailPanel": "" }
 	}
 }
