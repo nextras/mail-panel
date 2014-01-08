@@ -78,6 +78,7 @@ class MailPanel extends Object implements IBarPanel
 	{
 		$template = new FileTemplate();
 		$template->registerFilter(new Engine);
+		$template->registerHelperLoader('Nette\\Templating\\Helpers::loader');
 		$template->setFile(__DIR__ . '/MailPanel.latte');
 		$template->baseUrl = $this->request->getUrl()->getBaseUrl();
 		$template->messages = $this->mailer->getMessages($this->messagesLimit);
