@@ -100,7 +100,7 @@
 				<td colspan="2">
 					<iframe class="mail-body" id="mail-body-{$hash}-{$index}"></iframe>
 					<script type="text/javascript">
-						var mailContent = {$mailContent};
+						var mailContent = '<base target="_parent" />' + {$mailContent};
 						document.getElementById('mail-body-' + {$hash} + '-{$index}').contentWindow.document.write(mailContent);
 					</script>
 				</td>
