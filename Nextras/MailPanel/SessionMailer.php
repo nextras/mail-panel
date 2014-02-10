@@ -2,6 +2,7 @@
 
 namespace Nextras\MailPanel;
 
+use Nette\Http\Response;
 use Nette\Http\Session;
 use Nette\Http\SessionSection;
 use Nette\Mail\IMailer;
@@ -13,6 +14,7 @@ use Nette\Mail\Message;
  *
  * @author Jan Drábek
  * @author Jan Marek
+ * @author Jan Skrasek
  * @license New BSD
  */
 class SessionMailer implements IMailer
@@ -23,10 +25,14 @@ class SessionMailer implements IMailer
 	/** @var SessionSection */
 	private $sessionSection;
 
-	public function __construct(Session $session, $limit = 100, $sectionName = __CLASS__)
+
+	public function __construct(Session $session, Response $response, $limit = 100, $sectionName = __CLASS__)
 	{
 		$this->limit = $limit;
 		$this->sessionSection = $session->getSection($sectionName);
+		if (!$response->isSent() && !$session->isStarted()) {
+			$session->start();
+		}
 	}
 
 
