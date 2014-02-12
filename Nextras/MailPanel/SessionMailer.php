@@ -22,17 +22,18 @@ class SessionMailer implements IMailer
 	/** @var int */
 	private $limit;
 
+	/** @var Session */
+	private $session;
+
 	/** @var SessionSection */
 	private $sessionSection;
 
 
-	public function __construct(Session $session, Response $response, $limit = 100, $sectionName = __CLASS__)
+	public function __construct(Session $session, $limit = 100, $sectionName = __CLASS__)
 	{
 		$this->limit = $limit;
+		$this->session = $session;
 		$this->sessionSection = $session->getSection($sectionName);
-		if (!$response->isSent() && !$session->isStarted()) {
-			$session->start();
-		}
 	}
 
 
@@ -42,47 +43,61 @@ class SessionMailer implements IMailer
 	 */
 	public function send(Message $mail)
 	{
-		$mails = $this->sessionSection->sentMessages ?: array();
-
-		if (count($mails) === $this->limit) {
-			array_pop($mails);
-		}
-
 		// get message with generated html instead of set FileTemplate etc
 		$reflectionMethod = $mail->getReflection()->getMethod('build');
 		$reflectionMethod->setAccessible(TRUE);
 		$builtMail = $reflectionMethod->invoke($mail);
 
-		array_unshift($mails, $builtMail);
-
-		$this->sessionSection->sentMessages = $mails;
+		if ($this->canAccessSession()) {
+			$mails = $this->sessionSection->sentMessages ?: array();
+			if (count($mails) === $this->limit) {
+				array_pop($mails);
+			}
+			array_unshift($mails, $builtMail);
+			$this->sessionSection->sentMessages = $mails;
+		} else {
+			throw new \RuntimeException('Session is not started and you have already printed some contents.');
+		}
 	}
 
 
 	public function getMessages($limit = NULL)
 	{
-		$messages = $this->sessionSection->sentMessages ?: array();
-		return array_slice($messages, 0, $limit);
+		if ($this->canAccessSession()) {
+			$messages = $this->sessionSection->sentMessages ?: array();
+			return array_slice($messages, 0, $limit);
+
+		} else {
+			return [];
+		}
 	}
 
 
 	public function getMessageCount()
 	{
-		return count($this->sessionSection->sentMessages);
+		if ($this->canAccessSession()) {
+			return count($this->sessionSection->sentMessages);
+		} else {
+			return 0;
+		}
 	}
 
 
 	public function clear()
 	{
-		$this->sessionSection->sentMessages = array();
+		if ($this->canAccessSession()) {
+			$this->sessionSection->sentMessages = array();
+		}
 	}
 
 
 	public function deleteByIndex($index)
 	{
-		$messages = $this->sessionSection->sentMessages ?: array();
-		array_splice($messages, (int) $index, 1);
-		$this->sessionSection->sentMessages = $messages;
+		if ($this->canAccessSession()) {
+			$messages = $this->sessionSection->sentMessages ?: array();
+			array_splice($messages, (int) $index, 1);
+			$this->sessionSection->sentMessages = $messages;
+		}
 	}
 
 
@@ -93,6 +108,12 @@ class SessionMailer implements IMailer
 	public function getLimit()
 	{
 		return $this->limit;
+	}
+
+
+	private function canAccessSession()
+	{
+		return $this->session->isStarted() || !(!headers_sent() && ob_get_level() && ob_get_length());
 	}
 
 }
