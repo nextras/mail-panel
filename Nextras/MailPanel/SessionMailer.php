@@ -49,12 +49,12 @@ class SessionMailer implements IMailer
 		$builtMail = $reflectionMethod->invoke($mail);
 
 		if ($this->canAccessSession()) {
-			$mails = $this->sessionSection->sentMessages ?: array();
+			$mails = $this->getMessages();
 			if (count($mails) === $this->limit) {
 				array_pop($mails);
 			}
 			array_unshift($mails, $builtMail);
-			$this->sessionSection->sentMessages = $mails;
+			$this->setMessages($mails);
 		} else {
 			throw new \RuntimeException('Session is not started and you have already printed some contents.');
 		}
@@ -63,40 +63,41 @@ class SessionMailer implements IMailer
 
 	public function getMessages($limit = NULL)
 	{
-		if ($this->canAccessSession()) {
-			$messages = $this->sessionSection->sentMessages ?: array();
+		if ($this->canAccessSession() && isset($this->sessionSection->sentMessages)) {
+			$messages = $this->sessionSection->sentMessages;
 			return array_slice($messages, 0, $limit);
-
 		} else {
-			return [];
+			return array();
+		}
+	}
+	
+	
+	public function setMessages($messages)
+	{
+		if ($this->canAccessSession()) {
+			$this->sessionSection->sentMessages = $messages;
 		}
 	}
 
 
 	public function getMessageCount()
 	{
-		if ($this->canAccessSession()) {
-			return count($this->sessionSection->sentMessages);
-		} else {
-			return 0;
-		}
+		return count($this->getMessages());
 	}
 
 
 	public function clear()
 	{
-		if ($this->canAccessSession()) {
-			$this->sessionSection->sentMessages = array();
-		}
+		$this->setMessages(array());
 	}
 
 
 	public function deleteByIndex($index)
 	{
 		if ($this->canAccessSession()) {
-			$messages = $this->sessionSection->sentMessages ?: array();
+			$messages = $this->getMessages();
 			array_splice($messages, (int) $index, 1);
-			$this->sessionSection->sentMessages = $messages;
+			$this->setMessages($messages);
 		}
 	}
 
