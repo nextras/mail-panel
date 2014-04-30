@@ -21,7 +21,7 @@ Mailer has to be set as service "nette.mailer" in development configuration.
 ```
 services:
 	nette.mailer:
-		class: Nextras\MailPanel\FileMailer
+		class: Nextras\MailPanel\FileMailer(%tempDir%/mails)
 		# class: Nextras\MailPanel\SessionMailer
 ```
 
