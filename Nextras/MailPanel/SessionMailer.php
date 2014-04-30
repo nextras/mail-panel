@@ -112,7 +112,7 @@ class SessionMailer implements IMailer
 
 	private function canAccessSession()
 	{
-		return $this->session->isStarted() || !(!headers_sent() && ob_get_level() && ob_get_length());
+		return $this->session->isStarted();
 	}
 
 }
