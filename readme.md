@@ -1,10 +1,9 @@
 MailPanel
 =========
 
-Nette Debug panel for sent emails.
-
-* Authors: Jan Marek, Jan Drábek
-* License: New BSD
+Nette Debug panel for sent emails. Supports storing emails into
+- files
+- session
 
 Based on http://git.yavanna.cz/p/mailpanel/ by Jan Drábek.
 
@@ -17,12 +16,13 @@ Install library via composer:
 composer require nextras/mail-panel
 ```
 
-Session mailer has to be set as service "nette.mailer" in development configuration.
+Mailer has to be set as service "nette.mailer" in development configuration.
 
 ```
 services:
 	nette.mailer:
-		class: Nextras\MailPanel\SessionMailer
+		class: Nextras\MailPanel\FileMailer
+		# class: Nextras\MailPanel\SessionMailer
 ```
 
 Add MailPanel to debug bar:
