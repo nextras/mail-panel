@@ -2,10 +2,8 @@
 
 namespace Nextras\MailPanel;
 
-use Nette\Http\Response;
 use Nette\Http\Session;
 use Nette\Http\SessionSection;
-use Nette\Mail\IMailer;
 use Nette\Mail\Message;
 
 

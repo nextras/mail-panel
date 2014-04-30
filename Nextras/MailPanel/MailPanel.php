@@ -31,7 +31,7 @@ class MailPanel extends Object implements IBarPanel
 	private $messagesLimit;
 
 
-	public function __construct(Request $request, SessionMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
+	public function __construct(Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
 		$this->request = $request;
 		$this->mailer = $mailer;
