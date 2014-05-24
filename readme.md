@@ -20,9 +20,8 @@ Mailer has to be set as service "nette.mailer" in development configuration.
 
 ```
 services:
-	nette.mailer:
-		class: Nextras\MailPanel\FileMailer(%tempDir%/mails)
-		# class: Nextras\MailPanel\SessionMailer
+	nette.mailer: Nextras\MailPanel\FileMailer(%tempDir%/mails)
+#   nette.mailer: Nextras\MailPanel\SessionMailer
 ```
 
 Add MailPanel to debug bar:
@@ -31,7 +30,7 @@ Add MailPanel to debug bar:
 nette:
 	debugger:
 		bar:
-			- Nextras\MailPanel\MailPanel
+			- Nextras\MailPanel\MailPanel(%tempDir%)
 ```
 
 Usage

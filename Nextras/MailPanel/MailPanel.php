@@ -2,11 +2,10 @@
 
 namespace Nextras\MailPanel;
 
-use Nette\Diagnostics\IBarPanel;
 use Nette\Http\Request;
-use Nette\Latte\Engine;
 use Nette\Object;
-use Nette\Templating\FileTemplate;
+use Tracy\IBarPanel;
+use Latte;
 
 
 /**
@@ -30,12 +29,16 @@ class MailPanel extends Object implements IBarPanel
 	/** @var int */
 	private $messagesLimit;
 
+	/** @var string|NULL */
+	private $tempDir;
 
-	public function __construct(Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
+
+	public function __construct($tempDir, Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
 		$this->request = $request;
 		$this->mailer = $mailer;
 		$this->messagesLimit = $messagesLimit;
+		$this->tempDir = $tempDir;
 
 		$query = $request->getQuery("mail-panel");
 
@@ -76,14 +79,13 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	public function getPanel()
 	{
-		$template = new FileTemplate();
-		$template->registerFilter(new Engine);
-		$template->registerHelperLoader('Nette\\Templating\\Helpers::loader');
-		$template->setFile(__DIR__ . '/MailPanel.latte');
-		$template->baseUrl = $this->request->getUrl()->getBaseUrl();
-		$template->messages = $this->mailer->getMessages($this->messagesLimit);
+		$latte = new Latte\Engine;
+		$latte->setTempDirectory($this->tempDir);
 
-		return (string) $template;
+		return $latte->renderToString(__DIR__ . '/MailPanel.latte', array(
+			'baseUrl'  => $this->request->getUrl()->getBaseUrl(),
+			'messages' => $this->mailer->getMessages($this->messagesLimit),
+		));
 	}
 
 

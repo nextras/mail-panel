@@ -3,8 +3,8 @@
 namespace Nextras\MailPanel;
 
 use Nette\Object;
-use Nette\DateTime;
 use Nette\InvalidStateException;
+use Nette\Utils\DateTime;
 use Nette\Utils\Finder;
 use Nette\Mail\Message;
 
