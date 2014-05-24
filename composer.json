@@ -33,6 +33,6 @@
 		}
 	},
 	"autoload": {
-		"psr-0": { "Nextras\\MailPanel": "" }
+		"psr-4": { "Nextras\\MailPanel\\": "src/" }
 	}
 }
