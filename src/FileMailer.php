@@ -92,6 +92,7 @@ class FileMailer extends Object implements IMailer
 
 	public function clear()
 	{
+		$this->findMails();
 		foreach ($this->files as $file) {
 			@unlink($file);
 		}
