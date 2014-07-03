@@ -10,7 +10,7 @@ use Nette\Mail\Message;
 
 
 /**
- * Session mailer - emails are stored into files
+ * File mailer - emails are stored into files
  *
  * @author  Jan Skrasek
  * @license MIT
