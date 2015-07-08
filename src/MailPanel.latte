@@ -7,106 +7,104 @@
  * @licence New BSD
  *}
 <style>
-	.tracy-panel[id~=MailPanel] {
-		text-align: left;
+	div#tracy-debug .tracy-panel[id$=MailPanel] .tracy-inner {
+		max-height: 500px;
 		overflow: auto;
-		max-height: 600px;
 	}
-	.tracy-panel .mail-container {
+	.tracy-panel[id$=MailPanel] .mail-container {
 		margin-bottom: 10px !important;
-		width: 540px;
+		width: 600px;
 	}
-	.tracy-panel .mail-body {
+	.tracy-panel[id$=MailPanel] .mail-body {
 		border: 1px solid #A7A7A7 !important;
 		padding: 10px !important;
 		background: #FFF !important;
 		width: 100%;
 		height: auto;
+		box-sizing: padding-box;
 	}
-	.tracy-panel a.delete-link {
+	.tracy-panel[id$=MailPanel] a.delete-link {
 		float: right;
-	}
-	.tracy-panel a.delete-all-link {
-		float: right;
-		margin: 15px 5px 0 0 !important;
 	}
 </style>
 
-<a n:if="count($messages)" href="{$baseUrl}?mail-panel=delete" class="delete-all-link">Delete all</a>
 <h1>Sent emails</h1>
 {if count($messages) > 0}
-	{var $hash = Nette\Utils\Strings::random()}
-	{* Get newest at top *}
-	{foreach $messages as $index => $mail}
-		{* The message itself *}
-		<table class="mail-container">
-			<tr>
-				<th style="width: 30%"><strong>Subject</strong></th>
-				<td>
-					{$mail->getSubject()}
-					<a class="delete-link" href="{$baseUrl}?mail-panel={$index}">Delete</a>
-				</td>
-			</tr>
-			{var headers => $mail->getHeaders()}
-			<tr>
-				<th>From</th>
-				<td>
-					{if isset($headers["From"])}
-						{foreach $headers["From"] as $key => $value}
-							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
-						{/foreach}
-					{/if}
-				</td>
-			</tr>
-			<tr>
-				<th>To</th>
-				<td>
-					{if isset($headers["To"])}
-						{foreach $headers["To"] as $key => $value}
-							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
-						{/foreach}
-					{/if}
-				</td>
-			</tr>
-			{if isset($headers["Cc"])}
+	<a n:if="count($messages)" href="{$baseUrl}?mail-panel=delete" class="delete-all-link">Delete all</a>
+	<div class="tracy-inner">
+		{var $hash = Nette\Utils\Strings::random()}
+		{* Get newest at top *}
+		{foreach $messages as $index => $mail}
+			{* The message itself *}
+			<table class="mail-container">
 				<tr>
-					<th>CC</th>
+					<th style="width: 30%"><strong>Subject</strong></th>
 					<td>
-						{foreach $headers["Cc"] as $key => $value}
-							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
-						{/foreach}
+						{$mail->getSubject()}
+						<a class="delete-link" href="{$baseUrl}?mail-panel={$index}">Delete</a>
 					</td>
 				</tr>
-			{/if}
-			{if isset($headers["Bcc"])}
+				{var headers => $mail->getHeaders()}
 				<tr>
-					<th>BCC</th>
+					<th>From</th>
 					<td>
-						{foreach $headers["Bcc"] as $key => $value}
-							<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
-						{/foreach}
+						{if isset($headers["From"])}
+							{foreach $headers["From"] as $key => $value}
+								<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
+							{/foreach}
+						{/if}
 					</td>
 				</tr>
-			{/if}
-			{* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
-			{var $mailContent = $mail->getHtmlBody()}
-			{if $mailContent == NULL}
-				{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
-				<tr><th colspan="2">Plaintext e-mail</th></tr>
-			{else}
-				<tr><th colspan="2">HTML e-mail</th></tr>
-			{/if}
-			<tr>
-				<td colspan="2">
-					<iframe class="mail-body" id="mail-body-{$hash}-{$index}"></iframe>
-					<script type="text/javascript">
-						var mailContent = '<base target="_parent" />' + {$mailContent};
-						document.getElementById('mail-body-' + {$hash} + '-{$index}').contentWindow.document.write(mailContent);
-					</script>
-				</td>
-			</tr>
-		</table>
-	{/foreach}
+				<tr>
+					<th>To</th>
+					<td>
+						{if isset($headers["To"])}
+							{foreach $headers["To"] as $key => $value}
+								<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
+							{/foreach}
+						{/if}
+					</td>
+				</tr>
+				{if isset($headers["Cc"])}
+					<tr>
+						<th>CC</th>
+						<td>
+							{foreach $headers["Cc"] as $key => $value}
+								<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
+							{/foreach}
+						</td>
+					</tr>
+				{/if}
+				{if isset($headers["Bcc"])}
+					<tr>
+						<th>BCC</th>
+						<td>
+							{foreach $headers["Bcc"] as $key => $value}
+								<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
+							{/foreach}
+						</td>
+					</tr>
+				{/if}
+				{* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
+				{var $mailContent = $mail->getHtmlBody()}
+				{if $mailContent == NULL}
+					{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
+					<tr><th colspan="2">Plaintext e-mail</th></tr>
+				{else}
+					<tr><th colspan="2">HTML e-mail</th></tr>
+				{/if}
+				<tr>
+					<td colspan="2">
+						<iframe class="mail-body" id="mail-body-{$hash}-{$index}"></iframe>
+						<script type="text/javascript">
+							var mailContent = '<base target="_parent" />' + {$mailContent};
+							document.getElementById('mail-body-' + {$hash} + '-{$index}').contentWindow.document.write(mailContent);
+						</script>
+					</td>
+				</tr>
+			</table>
+		{/foreach}
+	</div>
 {else}
 	<p>No emails.</p>
 {/if}
