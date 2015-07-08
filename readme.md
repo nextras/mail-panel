@@ -27,10 +27,9 @@ services:
 Add MailPanel to debug bar:
 
 ```
-nette:
-	debugger:
-		bar:
-			- Nextras\MailPanel\MailPanel(%tempDir%)
+tracy:
+	bar:
+		- Nextras\MailPanel\MailPanel(%tempDir%)
 ```
 
 Usage
