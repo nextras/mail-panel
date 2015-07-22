@@ -98,7 +98,9 @@
 						<iframe class="mail-body" id="mail-body-{$hash}-{$index}"></iframe>
 						<script type="text/javascript">
 							var mailContent = '<base target="_parent" />' + {$mailContent};
-							document.getElementById('mail-body-' + {$hash} + '-{$index}').contentWindow.document.write(mailContent);
+							var iframeDocument = document.getElementById('mail-body-' + {$hash} + '-{$index}').contentWindow.document;
+							iframeDocument.write(mailContent);
+							iframeDocument.close();
 						</script>
 					</td>
 				</tr>
