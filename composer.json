@@ -19,7 +19,7 @@
 		}
 	],
 	"require": {
-		"php": "~5.3",
+		"php": ">=5.3",
 		"nette/mail":   "~2.2",
 		"nette/utils":  "~2.2",
 		"nette/http":   "~2.2",
