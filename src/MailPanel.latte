@@ -104,6 +104,15 @@
 						</script>
 					</td>
 				</tr>
+				{var $attachments = $mail->getAttachments()}
+				<tr n:if="$attachments">
+					<th>Attachments</th>
+					<td>
+						{foreach $attachments as $i => $row}
+							<a target="_blank" href="{$baseUrl}?mail-panel-attachment={$i}&mail-panel-mail={$index}">{$i + 1}. {$row->getHeader('Content-Type')}</a>{sep}<br>{/sep}
+						{/foreach}
+					</td>
+				</tr>
 			</table>
 		{/foreach}
 	</div>

@@ -3,6 +3,7 @@
 namespace Nextras\MailPanel;
 
 use Nette\Http\Request;
+use Nette\Mail\Message;
 use Nette\Object;
 use Tracy\IBarPanel;
 use Latte;
@@ -46,6 +47,13 @@ class MailPanel extends Object implements IBarPanel
 			$this->handleDeleteAll();
 		} elseif (is_numeric($query)) {
 			$this->handleDelete($query);
+		}
+
+		$attachment = $request->getQuery("mail-panel-attachment");
+		$mailId = $request->getQuery("mail-panel-mail");
+
+		if ($attachment !== NULL && $mailId !== NULL) {
+			$this->handleAttachment($attachment, $mailId);
 		}
 	}
 
@@ -114,6 +122,26 @@ class MailPanel extends Object implements IBarPanel
 	{
 		$this->mailer->deleteByIndex($id);
 		$this->returnBack();
+	}
+
+	private function handleAttachment($id, $mailId)
+	{
+		/** @var Message[] $list */
+		$list = $this->mailer->getMessages($this->messagesLimit);
+		if (!isset($list[$mailId])) {
+			return;
+		}
+		$attachments = $list[$mailId]->getAttachments();
+		if (!isset($attachments[$id])) {
+			return;
+		}
+		$attachment = $attachments[$id];
+		if (!$attachment->getHeader('Content-Type')) {
+			return;
+		}
+		header('Content-Type: ' . $attachment->getHeader('Content-Type'));
+		echo $attachment->getBody();
+		exit;
 	}
 
 }
