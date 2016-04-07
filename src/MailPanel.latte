@@ -23,7 +23,8 @@
 		height: auto;
 		box-sizing: padding-box;
 	}
-	.tracy-panel[id$=MailPanel] a.delete-link {
+	.tracy-panel[id$=MailPanel] a.delete-link,
+	.tracy-panel[id$=MailPanel] a.source-link {
 		float: right;
 	}
 </style>
@@ -87,12 +88,15 @@
 				{/if}
 				{* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
 				{var $mailContent = $mail->getHtmlBody()}
-				{if $mailContent == NULL}
-					{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
-					<tr><th colspan="2">Plaintext e-mail</th></tr>
-				{else}
-					<tr><th colspan="2">HTML e-mail</th></tr>
-				{/if}
+				<tr><th colspan="2">
+					{if $mailContent == NULL}
+						{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
+						Plaintext e-mail
+					{else}
+						HTML e-mail
+					{/if}
+					<a class="source-link" target="_blank" href="{$baseUrl}?mail-panel=source&mail-panel-mail={$index}">Source</a>
+				</th></tr>
 				<tr>
 					<td colspan="2">
 						<iframe class="mail-body" id="mail-body-{$hash}-{$index}"></iframe>

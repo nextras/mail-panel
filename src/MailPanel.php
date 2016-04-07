@@ -42,15 +42,17 @@ class MailPanel extends Object implements IBarPanel
 		$this->tempDir = $tempDir;
 
 		$query = $request->getQuery("mail-panel");
+		$mailId = $request->getQuery("mail-panel-mail");
 
-		if ($query === 'delete') {
+		if ($query === 'source' && is_numeric($mailId)) {
+			$this->handleSource($mailId);
+		} elseif ($query === 'delete') {
 			$this->handleDeleteAll();
 		} elseif (is_numeric($query)) {
 			$this->handleDelete($query);
 		}
 
 		$attachment = $request->getQuery("mail-panel-attachment");
-		$mailId = $request->getQuery("mail-panel-mail");
 
 		if ($attachment !== NULL && $mailId !== NULL) {
 			$this->handleAttachment($attachment, $mailId);
@@ -141,6 +143,18 @@ class MailPanel extends Object implements IBarPanel
 		}
 		header('Content-Type: ' . $attachment->getHeader('Content-Type'));
 		echo $attachment->getBody();
+		exit;
+	}
+
+	private function handleSource($mailId)
+	{
+		/** @var Message[] $list */
+		$list = $this->mailer->getMessages($this->messagesLimit);
+		if (!isset($list[$mailId])) {
+			return;
+		}
+		header('Content-Type: text/plain');
+		echo $list[$mailId]->getEncodedMessage();
 		exit;
 	}
 
