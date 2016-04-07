@@ -90,7 +90,12 @@
 				{var $mailContent = $mail->getHtmlBody()}
 				<tr><th colspan="2">
 					{if $mailContent == NULL}
-						{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
+						{if $mail->getAttachments()} {* Workaround: when plain text mail have attachments the text is not in body but in mime part! *}
+							{var $mailContent = '<pre style="font-family:serif">' . \Nextras\MailPanel\MailPanel::extractPlainText($mail) . '</pre>'}
+						{else}
+							{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
+						{/if}
+
 						Plaintext e-mail
 					{else}
 						HTML e-mail

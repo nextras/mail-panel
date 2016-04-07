@@ -4,7 +4,9 @@ namespace Nextras\MailPanel;
 
 use Nette\Http\Request;
 use Nette\Mail\Message;
+use Nette\Mail\MimePart;
 use Nette\Object;
+use Nette\Utils\Strings;
 use Tracy\IBarPanel;
 use Latte;
 
@@ -156,6 +158,19 @@ class MailPanel extends Object implements IBarPanel
 		header('Content-Type: text/plain');
 		echo $list[$mailId]->getEncodedMessage();
 		exit;
+	}
+
+	public static function extractPlainText(Message $message)
+	{
+		$propertyReflection = $message->getReflection()->getParentClass()->getProperty('parts');
+		$propertyReflection->setAccessible(true);
+		$parts = $propertyReflection->getValue($message);
+		/** @var MimePart $part */
+		foreach ($parts as $part) {
+			if (Strings::startsWith($part->getHeader('Content-Type'), 'text/plain') && $part->getHeader('Content-Transfer-Encoding') !== 'base64') { // Take first available plain text
+				return $part->getBody();
+			}
+		}
 	}
 
 }
