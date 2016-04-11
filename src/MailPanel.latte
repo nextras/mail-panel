@@ -88,20 +88,21 @@
 				{/if}
 				{* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
 				{var $mailContent = $mail->getHtmlBody()}
-				<tr><th colspan="2">
-					{if $mailContent == NULL}
-						{if $mail->getAttachments()} {* Workaround: when plain text mail have attachments the text is not in body but in mime part! *}
-							{var $mailContent = '<pre style="font-family:serif">' . \Nextras\MailPanel\MailPanel::extractPlainText($mail) . '</pre>'}
+				<tr>
+					<th colspan="2">
+						{if $mailContent == NULL}
+							{if $mail->getAttachments()} {* Workaround: when plain text mail have attachments the text is not in body but in mime part! *}
+								{var $mailContent = '<pre style="font-family:serif">' . \Nextras\MailPanel\MailPanel::extractPlainText($mail) . '</pre>'}
+							{else}
+								{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
+							{/if}
+							Plaintext e-mail
 						{else}
-							{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
+							HTML e-mail
 						{/if}
-
-						Plaintext e-mail
-					{else}
-						HTML e-mail
-					{/if}
-					<a class="source-link" target="_blank" href="{$baseUrl}?mail-panel=source&mail-panel-mail={$index}">Source</a>
-				</th></tr>
+						<a class="source-link" target="_blank" href="{$baseUrl}?mail-panel=source&mail-panel-mail={$index}">Source</a>
+					</th>
+				</tr>
 				<tr>
 					<td colspan="2">
 						<iframe class="mail-body" id="mail-body-{$hash}-{$index}"></iframe>
@@ -118,7 +119,7 @@
 					<th>Attachments</th>
 					<td>
 						{foreach $attachments as $i => $row}
-							<a target="_blank" href="{$baseUrl}?mail-panel-attachment={$i}&mail-panel-mail={$index}">{$i + 1}. {$row->getHeader('Content-Type')}</a>{sep}<br>{/sep}
+							<a target="_blank" href="{$baseUrl}?mail-panel-attachment={$i}&amp;mail-panel-mail={$index}">{$i + 1}. {$row->getHeader('Content-Type')}</a>{sep}<br>{/sep}
 						{/foreach}
 					</td>
 				</tr>
