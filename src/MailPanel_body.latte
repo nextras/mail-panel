@@ -1,0 +1,11 @@
+{* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
+{var $mailContent = $message->getHtmlBody()}
+{if $mailContent === NULL}
+    {if $message->getAttachments()}
+        <pre style="font-family:serif">{\Nextras\MailPanel\MailPanel::extractPlainText($message)}</pre>
+    {else}
+        <pre style="font-family:serif">{$message->getBody()}</pre>
+    {/if}
+{else}
+    {$mailContent|noEscape}
+{/if}

@@ -24,8 +24,10 @@
 		box-sizing: padding-box;
 	}
 	.tracy-panel[id$=MailPanel] a.delete-link,
+	.tracy-panel[id$=MailPanel] a.detail-link,
 	.tracy-panel[id$=MailPanel] a.source-link {
 		float: right;
+		margin-left: 10px !important;
 	}
 </style>
 
@@ -86,21 +88,17 @@
 						</td>
 					</tr>
 				{/if}
-				{* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
-				{var $mailContent = $mail->getHtmlBody()}
+				{* Prepare mail content for display *}
+				{capture $mailContent}{include MailPanel_body.latte, message => $mail}{/capture}
 				<tr>
 					<th colspan="2">
-						{if $mailContent == NULL}
-							{if $mail->getAttachments()} {* Workaround: when plain text mail have attachments the text is not in body but in mime part! *}
-								{var $mailContent = '<pre style="font-family:serif">' . \Nextras\MailPanel\MailPanel::extractPlainText($mail) . '</pre>'}
-							{else}
-								{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
-							{/if}
+						{if \Nextras\MailPanel\MailPanel::isPlainText($mail)}
 							Plaintext e-mail
 						{else}
 							HTML e-mail
 						{/if}
-						<a class="source-link" target="_blank" href="{$baseUrl}?mail-panel=source&mail-panel-mail={$index}">Source</a>
+						<a class="source-link" target="_blank" href="{$baseUrl}?mail-panel=source&amp;mail-panel-mail={$index}">Source</a>
+						<a class="detail-link" target="_blank" href="{$baseUrl}?mail-panel=detail&amp;mail-panel-mail={$index}">Open</a>
 					</th>
 				</tr>
 				<tr>
