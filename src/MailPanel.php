@@ -24,11 +24,11 @@ class MailPanel extends Object implements IBarPanel
 	/** @const int */
 	const DEFAULT_COUNT = 5;
 
-	/** @var Request */
-	private $request;
-
 	/** @var SessionMailer */
 	private $mailer;
+
+	/** @var Request */
+	private $request;
 
 	/** @var int */
 	private $messagesLimit;
@@ -40,10 +40,10 @@ class MailPanel extends Object implements IBarPanel
 	private $latteEngine;
 
 
-	public function __construct($tempDir, Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
+	public function __construct($tempDir, IMailer $mailer, Request $request, $messagesLimit = self::DEFAULT_COUNT)
 	{
-		$this->request = $request;
 		$this->mailer = $mailer;
+		$this->request = $request;
 		$this->messagesLimit = $messagesLimit;
 		$this->tempDir = $tempDir;
 
