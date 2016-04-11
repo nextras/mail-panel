@@ -2,9 +2,12 @@
 
 namespace Nextras\MailPanel;
 
+use Latte\Engine;
 use Nette\Http\Request;
 use Nette\Mail\Message;
+use Nette\Mail\MimePart;
 use Nette\Object;
+use Nette\Utils\Strings;
 use Tracy\IBarPanel;
 use Latte;
 
@@ -33,6 +36,9 @@ class MailPanel extends Object implements IBarPanel
 	/** @var string|NULL */
 	private $tempDir;
 
+	/** @var Engine */
+	private $latteEngine;
+
 
 	public function __construct($tempDir, Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
@@ -42,15 +48,19 @@ class MailPanel extends Object implements IBarPanel
 		$this->tempDir = $tempDir;
 
 		$query = $request->getQuery("mail-panel");
+		$mailId = $request->getQuery("mail-panel-mail");
 
-		if ($query === 'delete') {
+		if ($query === 'detail' && is_numeric($mailId)) {
+			$this->handleDetail($mailId);
+		} elseif ($query === 'source' && is_numeric($mailId)) {
+			$this->handleSource($mailId);
+		} elseif ($query === 'delete') {
 			$this->handleDeleteAll();
 		} elseif (is_numeric($query)) {
 			$this->handleDelete($query);
 		}
 
 		$attachment = $request->getQuery("mail-panel-attachment");
-		$mailId = $request->getQuery("mail-panel-mail");
 
 		if ($attachment !== NULL && $mailId !== NULL) {
 			$this->handleAttachment($attachment, $mailId);
@@ -94,13 +104,21 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	public function getPanel()
 	{
-		$latte = new Latte\Engine;
-		$latte->setTempDirectory($this->tempDir);
+		$latte = $this->getLatteEngine();
 
 		return $latte->renderToString(__DIR__ . '/MailPanel.latte', array(
 			'baseUrl'  => $this->request->getUrl()->getBaseUrl(),
 			'messages' => $this->mailer->getMessages($this->messagesLimit),
 		));
+	}
+
+	private function getLatteEngine()
+	{
+		if (!isset($this->latteEngine)) {
+			$this->latteEngine = new Engine;
+			$this->latteEngine->setTempDirectory($this->tempDir);
+		}
+		return $this->latteEngine;
 	}
 
 
@@ -142,6 +160,51 @@ class MailPanel extends Object implements IBarPanel
 		header('Content-Type: ' . $attachment->getHeader('Content-Type'));
 		echo $attachment->getBody();
 		exit;
+	}
+
+	private function handleSource($mailId)
+	{
+		/** @var Message[] $list */
+		$list = $this->mailer->getMessages($this->messagesLimit);
+		if (!isset($list[$mailId])) {
+			return;
+		}
+		header('Content-Type: text/plain');
+		echo $list[$mailId]->getEncodedMessage();
+		exit;
+	}
+	private function handleDetail($mailId)
+	{
+		/** @var Message[] $list */
+		$list = $this->mailer->getMessages($this->messagesLimit);
+		if (!isset($list[$mailId])) {
+			return;
+		}
+		header('Content-Type: text/html');
+		$latte = $this->getLatteEngine();
+
+		$latte->render(__DIR__ . '/MailPanel_body.latte', array(
+			'message' => $list[$mailId],
+		));
+		exit;
+	}
+
+	public static function extractPlainText(Message $message)
+	{
+		$propertyReflection = $message->getReflection()->getParentClass()->getProperty('parts');
+		$propertyReflection->setAccessible(true);
+		$parts = $propertyReflection->getValue($message);
+		/** @var MimePart $part */
+		foreach ($parts as $part) {
+			if (Strings::startsWith($part->getHeader('Content-Type'), 'text/plain') && $part->getHeader('Content-Transfer-Encoding') !== 'base64') { // Take first available plain text
+				return $part->getBody();
+			}
+		}
+	}
+
+	public static function isPlainText(Message $message)
+	{
+		return $message->getHtmlBody() === NULL; // naive heuristic
 	}
 
 }

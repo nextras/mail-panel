@@ -23,8 +23,11 @@
 		height: auto;
 		box-sizing: padding-box;
 	}
-	.tracy-panel[id$=MailPanel] a.delete-link {
+	.tracy-panel[id$=MailPanel] a.delete-link,
+	.tracy-panel[id$=MailPanel] a.detail-link,
+	.tracy-panel[id$=MailPanel] a.source-link {
 		float: right;
+		margin-left: 10px !important;
 	}
 </style>
 
@@ -85,14 +88,19 @@
 						</td>
 					</tr>
 				{/if}
-				{* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
-				{var $mailContent = $mail->getHtmlBody()}
-				{if $mailContent == NULL}
-					{var $mailContent = '<pre style="font-family:serif">' . $mail->getBody() . '</pre>'}
-					<tr><th colspan="2">Plaintext e-mail</th></tr>
-				{else}
-					<tr><th colspan="2">HTML e-mail</th></tr>
-				{/if}
+				{* Prepare mail content for display *}
+				{capture $mailContent}{include MailPanel_body.latte, message => $mail}{/capture}
+				<tr>
+					<th colspan="2">
+						{if \Nextras\MailPanel\MailPanel::isPlainText($mail)}
+							Plaintext e-mail
+						{else}
+							HTML e-mail
+						{/if}
+						<a class="source-link" target="_blank" href="{$baseUrl}?mail-panel=source&amp;mail-panel-mail={$index}">Source</a>
+						<a class="detail-link" target="_blank" href="{$baseUrl}?mail-panel=detail&amp;mail-panel-mail={$index}">Open</a>
+					</th>
+				</tr>
 				<tr>
 					<td colspan="2">
 						<iframe class="mail-body" id="mail-body-{$hash}-{$index}"></iframe>
@@ -109,7 +117,7 @@
 					<th>Attachments</th>
 					<td>
 						{foreach $attachments as $i => $row}
-							<a target="_blank" href="{$baseUrl}?mail-panel-attachment={$i}&mail-panel-mail={$index}">{$i + 1}. {$row->getHeader('Content-Type')}</a>{sep}<br>{/sep}
+							<a target="_blank" href="{$baseUrl}?mail-panel-attachment={$i}&amp;mail-panel-mail={$index}">{$i + 1}. {$row->getHeader('Content-Type')}</a>{sep}<br>{/sep}
 						{/foreach}
 					</td>
 				</tr>
