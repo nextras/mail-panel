@@ -53,26 +53,24 @@ class MailPanel extends Object implements IBarPanel
 		$this->mailer = $mailer;
 		$this->messagesLimit = $messagesLimit;
 
-		$query = $request->getQuery('mail-panel');
-		$mailId = $request->getQuery('mail-panel-mail');
+		$action = $request->getQuery('nextras-mail-panel-action');
+		$messageId = $request->getQuery('nextras-mail-panel-message-id');
+		$attachmentId = $request->getQuery('nextras-mail-panel-attachment-id');
 
-		if ($query === 'detail' && is_string($mailId)) {
-			$this->handleDetail($mailId);
+		if ($action === 'detail' && is_string($messageId)) {
+			$this->handleDetail($messageId);
 
-		} elseif ($query === 'source' && is_string($mailId)) {
-			$this->handleSource($mailId);
+		} elseif ($action === 'source' && is_string($messageId)) {
+			$this->handleSource($messageId);
 
-		} elseif ($query === 'delete') {
+		} elseif ($action === 'attachment' && is_string($messageId) && ctype_digit($attachmentId)) {
+			$this->handleAttachment($messageId, $attachmentId);
+
+		} elseif ($action === 'delete-one' && is_string($messageId)) {
+			$this->handleDeleteOne($messageId);
+
+		} elseif ($action === 'delete-all') {
 			$this->handleDeleteAll();
-
-		} elseif (is_string($query)) {
-			$this->handleDeleteOne($query);
-		}
-
-		$attachment = $request->getQuery('mail-panel-attachment');
-
-		if ($attachment !== NULL && $mailId !== NULL) {
-			$this->handleAttachment($mailId, $attachment);
 		}
 	}
 
@@ -114,13 +112,32 @@ class MailPanel extends Object implements IBarPanel
 	public function getPanel()
 	{
 		$latte = $this->getLatteEngine();
+
+		return $latte->renderToString(__DIR__ . '/MailPanel.latte', array(
+			'getLink' => array($this, 'getLink'),
+			'messages' => $this->mailer->getMessages($this->messagesLimit),
+		));
+	}
+
+
+	/**
+	 * Run-time link helper
+	 * @param  string $action
+	 * @param  array  $params
+	 * @return string
+	 */
+	public function getLink($action, array $params)
+	{
 		$url = $this->request->getUrl();
 		$baseUrl = substr($url->getPath(), strrpos($url->getScriptPath(), '/') + 1);
 
-		return $latte->renderToString(__DIR__ . '/MailPanel.latte', array(
-			'baseUrl'  => $baseUrl,
-			'messages' => $this->mailer->getMessages($this->messagesLimit),
-		));
+		$params = array('action' => $action) + $params;
+		$query = array();
+		foreach ($params as $key => $value) {
+			$query["nextras-mail-panel-$key"] = $value;
+		}
+
+		return $baseUrl . '?' . http_build_query($query);
 	}
 
 
@@ -133,6 +150,11 @@ class MailPanel extends Object implements IBarPanel
 			$this->latteEngine = new Latte\Engine();
 			$this->latteEngine->setTempDirectory($this->tempDir);
 			$this->latteEngine->setAutoRefresh(FALSE);
+
+			$this->latteEngine->onCompile[] = function (Latte\Engine $engine) {
+				$set = new Latte\Macros\MacroSet($engine->getCompiler());
+				$set->addMacro('link', 'echo %escape($getLink(%node.word, %node.array))');
+			};
 
 			$this->latteEngine->addFilter('attachmentLabel', function (MimePart $attachment) {
 				$contentDisposition = $attachment->getHeader('Content-Disposition');
@@ -198,17 +220,13 @@ class MailPanel extends Object implements IBarPanel
 
 
 	/**
-	 * @param  int $mailId
-	 * @param  int $attachmentId
+	 * @param  string $messageId
+	 * @param  int    $attachmentId
+	 * @return void
 	 */
-	private function handleAttachment($mailId, $attachmentId)
+	private function handleAttachment($messageId, $attachmentId)
 	{
-		$list = $this->mailer->getMessages($this->messagesLimit);
-		if (!isset($list[$mailId])) {
-			return;
-		}
-
-		$attachments = $list[$mailId]->getAttachments();
+		$attachments = $this->mailer->getMessage($messageId)->getAttachments();
 		if (!isset($attachments[$attachmentId])) {
 			return;
 		}
@@ -225,36 +243,30 @@ class MailPanel extends Object implements IBarPanel
 
 
 	/**
-	 * @param  int $mailId
+	 * @param  string $messageId
 	 * @return void
 	 */
-	private function handleSource($mailId)
+	private function handleSource($messageId)
 	{
-		$list = $this->mailer->getMessages($this->messagesLimit);
-		if (!isset($list[$mailId])) {
-			return;
-		}
+		$message = $this->mailer->getMessage($messageId);
 
 		header('Content-Type: text/plain');
-		echo $list[$mailId]->getEncodedMessage();
+		echo $message->getEncodedMessage();
 		exit;
 	}
 
 
 	/**
-	 * @param  int $mailId
+	 * @param  string $messageId
 	 * @return void
 	 */
-	private function handleDetail($mailId)
+	private function handleDetail($messageId)
 	{
-		$list = $this->mailer->getMessages($this->messagesLimit);
-		if (!isset($list[$mailId])) {
-			return;
-		}
+		$message = $this->mailer->getMessage($messageId);
 
 		header('Content-Type: text/html');
 		$latte = $this->getLatteEngine();
-		$latte->render(__DIR__ . '/MailPanel_body.latte', array('message' => $list[$mailId]));
+		$latte->render(__DIR__ . '/MailPanel_body.latte', array('message' => $message));
 		exit;
 	}
 }

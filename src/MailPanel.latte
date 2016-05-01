@@ -43,7 +43,7 @@
 		<table>
 			<tr>
 				<th colspan="2">
-					<a class="action-link" href="{$baseUrl}?mail-panel=delete">Delete all</a>
+					<a class="action-link" href="{link delete-all}">Delete all</a>
 				</th>
 			</tr>
 		</table>
@@ -53,9 +53,9 @@
 				<tr>
 					<th colspan="2">
 						<span title="Sent at {$message->getHeader('Date')}">{$message->subject}</span>
-						<a class="action-link" target="_blank" href="{$baseUrl}?mail-panel={$messageId}">Delete</a>
-						<a class="action-link" target="_blank" href="{$baseUrl}?mail-panel=source&amp;mail-panel-mail={$messageId}">Source</a>
-						<a class="action-link" target="_blank" href="{$baseUrl}?mail-panel=detail&amp;mail-panel-mail={$messageId}">Open</a>
+						<a class="action-link" href="{link delete-one, message-id => $messageId}">Delete</a>
+						<a class="action-link" target="_blank" href="{link source, message-id => $messageId}">Source</a>
+						<a class="action-link" target="_blank" href="{link detail, message-id => $messageId}">Open</a>
 						<a class="action-link tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .mail-preview-html">Preview HTML</a>
 						<a class="action-link tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .mail-preview-txt">Preview TXT</a>
 					</th>
@@ -78,7 +78,7 @@
 					<th>Attachments</th>
 					<td>
 						{foreach $attachments as $attachmentId => $attachment}
-							<a target="_blank" href="{$baseUrl}?mail-panel-mail={$messageId}&amp;mail-panel-attachment={$i}">{$attachment|attachmentLabel}</a>
+							<a target="_blank" href="{link attachment, message-id => $messageId, attachment-id => $attachmentId}">{$attachment|attachmentLabel}</a>
 							{sep}<br>{/sep}
 						{/foreach}
 					</td>
