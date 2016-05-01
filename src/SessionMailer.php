@@ -59,8 +59,8 @@ class SessionMailer implements IPersistentMailer
 
 		$this->requireSessions();
 		$hash = substr(md5($builtMessage->getHeader('Message-ID')), 0, 6);
-		$this->sessionSection->sentMessages = array_slice(
-			array($hash => $builtMessage) + $this->sessionSection->sentMessages,
+		$this->sessionSection->messages = array_slice(
+			array($hash => $builtMessage) + $this->sessionSection->messages,
 			0, $this->limit, TRUE
 		);
 	}
@@ -82,11 +82,11 @@ class SessionMailer implements IPersistentMailer
 	{
 		$this->requireSessions();
 
-		if (!isset($this->sessionSection->sentMessages[$messageId])) {
+		if (!isset($this->sessionSection->messages[$messageId])) {
 			throw new \RuntimeException("Unable to find mail with ID $messageId");
 		}
 
-		return $this->sessionSection->sentMessages[$messageId];
+		return $this->sessionSection->messages[$messageId];
 	}
 
 
@@ -95,8 +95,8 @@ class SessionMailer implements IPersistentMailer
 	 */
 	public function getMessages($limit = NULL)
 	{
-		if ($this->session->isStarted() && isset($this->sessionSection->sentMessages)) {
-			$messages = $this->sessionSection->sentMessages;
+		if ($this->session->isStarted() && isset($this->sessionSection->messages)) {
+			$messages = $this->sessionSection->messages;
 			return array_slice($messages, 0, $limit, TRUE);
 
 		} else {
@@ -111,11 +111,11 @@ class SessionMailer implements IPersistentMailer
 	public function deleteOne($messageId)
 	{
 		$this->requireSessions();
-		if (!isset($this->sessionSection->sentMessages[$messageId])) {
+		if (!isset($this->sessionSection->messages[$messageId])) {
 			throw new \RuntimeException("Unable to find mail with ID $messageId");
 		}
 
-		unset($this->sessionSection->sentMessages[$messageId]);
+		unset($this->sessionSection->messages[$messageId]);
 	}
 
 
@@ -124,7 +124,7 @@ class SessionMailer implements IPersistentMailer
 	 */
 	public function deleteAll()
 	{
-		$this->sessionSection->sentMessages = array();
+		$this->sessionSection->messages = array();
 	}
 
 
@@ -147,8 +147,8 @@ class SessionMailer implements IPersistentMailer
 			throw new \RuntimeException('Session is not started, start session or use FileMailer instead.');
 		}
 
-		if (!isset($this->sessionSection->sentMessages)) {
-			$this->sessionSection->sentMessages = array();
+		if (!isset($this->sessionSection->messages)) {
+			$this->sessionSection->messages = array();
 		}
 	}
 }
