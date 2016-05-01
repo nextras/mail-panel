@@ -1,55 +1,68 @@
-{**
- * Template rendering mail messages sent via SessionMailer
- *
- * @author Jan Drábek
- * @author Jan Marek
- * @author Jan Skrasek
- * @licence New BSD
- *}
 <style>
-	div#tracy-debug .tracy-panel[id$=MailPanel] .tracy-inner {
-		max-height: 500px;
-		overflow: auto;
+	#tracy-debug .tracy-panel[id$=MailPanel] .tracy-inner {
+		overflow-y: scroll; /* reserve space for scrollbar */
 	}
-	.tracy-panel[id$=MailPanel] .mail-container {
-		margin-bottom: 10px !important;
+
+	#tracy-debug .tracy-panel[id$=MailPanel] table {
+		margin-bottom: 10px;
+		margin-right: 10px;
 		width: 600px;
 	}
-	.tracy-panel[id$=MailPanel] .mail-body {
-		border: 1px solid #A7A7A7 !important;
-		padding: 10px !important;
-		background: #FFF !important;
-		width: 100%;
-		height: auto;
-		box-sizing: padding-box;
+
+	#tracy-debug .tracy-panel[id$=MailPanel] table:last-child {
+		margin-bottom: 0;
 	}
-	.tracy-panel[id$=MailPanel] a.delete-link,
-	.tracy-panel[id$=MailPanel] a.detail-link,
-	.tracy-panel[id$=MailPanel] a.source-link {
+
+	#tracy-debug .tracy-panel[id$=MailPanel] th {
+		width: 80px;
+	}
+
+	#tracy-debug .tracy-panel[id$=MailPanel] a.action-link {
 		float: right;
-		margin-left: 10px !important;
+		margin-left: 10px;
+	}
+
+	#tracy-debug .tracy-panel[id$=MailPanel] .mail-preview-txt td {
+		white-space: pre;
+	}
+
+	#tracy-debug .tracy-panel[id$=MailPanel] .mail-preview-html td {
+		padding: 0;
+	}
+
+	#tracy-debug .tracy-panel[id$=MailPanel] .mail-preview-html iframe {
+		width: 100%;
+		min-height: 10px;
+		background: #FFF;
 	}
 </style>
 
 <h1>Sent emails</h1>
 {if count($messages) > 0}
-	<a n:if="count($messages)" href="{$baseUrl}?mail-panel=delete" class="delete-all-link">Delete all</a>
 	<div class="tracy-inner">
-		{var $hash = Nette\Utils\Strings::random()}
-		{* Get newest at top *}
-		{foreach $messages as $index => $mail}
-			{* The message itself *}
-			<table class="mail-container">
+		<table>
+			<tr>
+				<th colspan="2">
+					<a class="action-link" href="{$baseUrl}?mail-panel=delete">Delete all</a>
+				</th>
+			</tr>
+		</table>
+
+		{foreach $messages as $messageId => $message}
+			<table>
 				<tr>
-					<th style="width: 30%"><strong>Subject</strong></th>
-					<td>
-						{$mail->getSubject()}
-						<a class="delete-link" href="{$baseUrl}?mail-panel={$index}">Delete</a>
-					</td>
+					<th colspan="2">
+						<span title="Sent at {$message->getHeader('Date')}">{$message->subject}</span>
+						<a class="action-link" target="_blank" href="{$baseUrl}?mail-panel={$messageId}">Delete</a>
+						<a class="action-link" target="_blank" href="{$baseUrl}?mail-panel=source&amp;mail-panel-mail={$messageId}">Source</a>
+						<a class="action-link" target="_blank" href="{$baseUrl}?mail-panel=detail&amp;mail-panel-mail={$messageId}">Open</a>
+						<a class="action-link tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .mail-preview-html">Preview HTML</a>
+						<a class="action-link tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .mail-preview-txt">Preview TXT</a>
+					</th>
 				</tr>
 
 				{foreach [From, To, Cc, Bcc] as $headerName}
-					{var $header = $mail->getHeader($headerName)}
+					{var $header = $message->getHeader($headerName)}
 					<tr n:ifset="$header">
 						<th>{$headerName}</th>
 						<td>
@@ -60,37 +73,42 @@
 					</tr>
 				{/foreach}
 
-				{* Prepare mail content for display *}
-				{capture $mailContent}{include MailPanel_body.latte, message => $mail}{/capture}
-				<tr>
-					<th colspan="2">
-						{if \Nextras\MailPanel\MailPanel::isPlainText($mail)}
-							Plaintext e-mail
-						{else}
-							HTML e-mail
-						{/if}
-						<a class="source-link" target="_blank" href="{$baseUrl}?mail-panel=source&amp;mail-panel-mail={$index}">Source</a>
-						<a class="detail-link" target="_blank" href="{$baseUrl}?mail-panel=detail&amp;mail-panel-mail={$index}">Open</a>
-					</th>
-				</tr>
-				<tr>
-					<td colspan="2">
-						<iframe class="mail-body" id="mail-body-{$hash}-{$index}"></iframe>
-						<script type="text/javascript">
-							var mailContent = '<base target="_parent" />' + {$mailContent};
-							var iframeDocument = document.getElementById('mail-body-' + {$hash} + '-{$index}').contentWindow.document;
-							iframeDocument.write(mailContent);
-							iframeDocument.close();
-						</script>
-					</td>
-				</tr>
-				{var $attachments = $mail->getAttachments()}
+				{var $attachments = $message->getAttachments()}
 				<tr n:if="$attachments">
 					<th>Attachments</th>
 					<td>
-						{foreach $attachments as $i => $row}
-							<a target="_blank" href="{$baseUrl}?mail-panel-attachment={$i}&amp;mail-panel-mail={$index}">{$i + 1}. {$row->getHeader('Content-Type')}</a>{sep}<br>{/sep}
+						{foreach $attachments as $attachmentId => $attachment}
+							<a target="_blank" href="{$baseUrl}?mail-panel-mail={$messageId}&amp;mail-panel-attachment={$i}">{$attachment|attachmentLabel}</a>
+							{sep}<br>{/sep}
 						{/foreach}
+					</td>
+				</tr>
+
+
+				<tr class="mail-preview-txt tracy-collapsed">
+					<td colspan="2">{$message|plainText}</td>
+				</tr>
+
+				{capture $messageContent}{include MailPanel_body.latte, message => $message}{/capture}
+				<tr class="mail-preview-html tracy-collapsed">
+					<td colspan="2">
+						<iframe id="mail-preview-{$messageId}"></iframe>
+						<script type="text/javascript">
+							var mailContent = '<base target="_parent" />' + {$messageContent};
+							var iframe = document.getElementById('mail-preview-{$messageId}');
+							var iframeDocument = iframe.contentWindow.document;
+
+							iframe.addEventListener('load', function () {
+								if (iframeDocument.body.scrollHeight >= 34) {
+									iframe.style.height = iframeDocument.body.scrollHeight + 'px';
+								} else {
+									iframe.style.height = 'auto'; // fallback when scrollHeight is broken
+								}
+							});
+
+							iframeDocument.write(mailContent);
+							iframeDocument.close();
+						</script>
 					</td>
 				</tr>
 			</table>

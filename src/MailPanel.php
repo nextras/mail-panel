@@ -134,6 +134,33 @@ class MailPanel extends Object implements IBarPanel
 			$this->latteEngine = new Latte\Engine();
 			$this->latteEngine->setTempDirectory($this->tempDir);
 			$this->latteEngine->setAutoRefresh(FALSE);
+
+			$this->latteEngine->addFilter('attachmentLabel', function (MimePart $attachment) {
+				$contentDisposition = $attachment->getHeader('Content-Disposition');
+				$contentType = $attachment->getHeader('Content-Type');
+				$matches  = Strings::match($contentDisposition, '#filename="(.+?)"#');
+				return ($matches ? "$matches[1] " : '') . "($contentType)";
+			});
+
+			$this->latteEngine->addFilter('plainText', function (MimePart $part) {
+				$ref = new \ReflectionProperty('Nette\Mail\MimePart', 'parts');
+				$ref->setAccessible(TRUE);
+
+				$queue = array($part);
+				for ($i = 0; $i < count($queue); $i++) {
+					/** @var MimePart $subPart */
+					foreach ($ref->getValue($queue[$i]) as $subPart) {
+						$contentType = $subPart->getHeader('Content-Type');
+						if (Strings::startsWith($contentType, 'text/plain') && $subPart->getHeader('Content-Transfer-Encoding') !== 'base64') { // Take first available plain text
+							return (string) $subPart->getBody();
+						} elseif (Strings::startsWith($contentType, 'multipart/alternative')) {
+							$queue[] = $subPart;
+						}
+					}
+				}
+
+				return $part->getBody();
+			});
 		}
 
 		return $this->latteEngine;
@@ -230,33 +257,5 @@ class MailPanel extends Object implements IBarPanel
 		$latte = $this->getLatteEngine();
 		$latte->render(__DIR__ . '/MailPanel_body.latte', array('message' => $list[$mailId]));
 		exit;
-	}
-
-
-	/**
-	 * @param  Message $message
-	 * @return mixed
-	 */
-	public static function extractPlainText(Message $message)
-	{
-		$propertyReflection = $message->getReflection()->getParentClass()->getProperty('parts');
-		$propertyReflection->setAccessible(true);
-		$parts = $propertyReflection->getValue($message);
-		/** @var MimePart $part */
-		foreach ($parts as $part) {
-			if (Strings::startsWith($part->getHeader('Content-Type'), 'text/plain') && $part->getHeader('Content-Transfer-Encoding') !== 'base64') { // Take first available plain text
-				return $part->getBody();
-			}
-		}
-	}
-
-
-	/**
-	 * @param  Message $message
-	 * @return bool
-	 */
-	public static function isPlainText(Message $message)
-	{
-		return $message->getHtmlBody() === NULL; // naive heuristic
 	}
 }
