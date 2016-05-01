@@ -35,7 +35,7 @@ class FileMailer extends Object implements IPersistentMailer
 
 
 	/**
-	 * Store mails to files.
+	 * Stores mail to a file.
 	 *
 	 * @param  Message $message
 	 * @return void
@@ -61,7 +61,7 @@ class FileMailer extends Object implements IPersistentMailer
 	 */
 	public function getMessageCount()
 	{
-		return count($this->findMails());
+		return count($this->findFiles());
 	}
 
 
@@ -70,7 +70,7 @@ class FileMailer extends Object implements IPersistentMailer
 	 */
 	public function getMessage($messageId)
 	{
-		$files = $this->findMails();
+		$files = $this->findFiles();
 		if (!isset($files[$messageId])) {
 			throw new \RuntimeException("Unable to find mail with ID $messageId");
 		}
@@ -84,7 +84,7 @@ class FileMailer extends Object implements IPersistentMailer
 	 */
 	public function getMessages($limit)
 	{
-		$files = array_slice($this->findMails(), 0, $limit, TRUE);
+		$files = array_slice($this->findFiles(), 0, $limit, TRUE);
 		$mails = array_map(array($this, 'readMail'), $files);
 
 		return $mails;
@@ -96,7 +96,7 @@ class FileMailer extends Object implements IPersistentMailer
 	 */
 	public function deleteOne($messageId)
 	{
-		$files = $this->findMails();
+		$files = $this->findFiles();
 		if (!isset($files[$messageId])) {
 			throw new \RuntimeException("Unable to find mail with ID $messageId");
 		}
@@ -110,7 +110,7 @@ class FileMailer extends Object implements IPersistentMailer
 	 */
 	public function deleteAll()
 	{
-		foreach ($this->findMails() as $file) {
+		foreach ($this->findFiles() as $file) {
 			FileSystem::delete($file);
 		}
 	}
@@ -119,7 +119,7 @@ class FileMailer extends Object implements IPersistentMailer
 	/**
 	 * @return string[]
 	 */
-	private function findMails()
+	private function findFiles()
 	{
 		$files = array();
 
