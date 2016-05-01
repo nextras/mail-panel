@@ -89,7 +89,7 @@
 					<td colspan="2">{$message|plainText}</td>
 				</tr>
 
-				{capture $messageContent}{include MailPanel_body.latte, message => $message}{/capture}
+				{capture $messageContent}{include MailPanel.body.latte, message => $message}{/capture}
 				<tr class="mail-preview-html tracy-collapsed">
 					<td colspan="2">
 						<iframe id="mail-preview-{$messageId}"></iframe>

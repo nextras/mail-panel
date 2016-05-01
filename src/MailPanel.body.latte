@@ -1,6 +1,6 @@
 {* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
 {if $message->htmlBody !== NULL}
-    {$message->htmlBody|noEscape}
+    {$message->htmlBody|noescape}
 {else}
     <!doctype html>
     <meta charset="utf-8">

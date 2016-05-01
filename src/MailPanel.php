@@ -266,7 +266,7 @@ class MailPanel extends Object implements IBarPanel
 
 		header('Content-Type: text/html');
 		$latte = $this->getLatteEngine();
-		$latte->render(__DIR__ . '/MailPanel_body.latte', array('message' => $message));
+		$latte->render(__DIR__ . '/MailPanel.body.latte', array('message' => $message));
 		exit;
 	}
 }
