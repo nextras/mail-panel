@@ -115,9 +115,11 @@ class MailPanel extends Object implements IBarPanel
 	public function getPanel()
 	{
 		$latte = $this->getLatteEngine();
+		$url = $this->request->getUrl();
+		$baseUrl = substr($url->getPath(), strrpos($url->getScriptPath(), '/') + 1);
 
 		return $latte->renderToString(__DIR__ . '/MailPanel.latte', array(
-			'baseUrl'  => $this->request->getUrl()->getBaseUrl(),
+			'baseUrl'  => $baseUrl,
 			'messages' => $this->mailer->getMessages($this->messagesLimit),
 		));
 	}
