@@ -53,25 +53,7 @@ class MailPanel extends Object implements IBarPanel
 		$this->mailer = $mailer;
 		$this->messagesLimit = $messagesLimit;
 
-		$action = $request->getQuery('nextras-mail-panel-action');
-		$messageId = $request->getQuery('nextras-mail-panel-message-id');
-		$attachmentId = $request->getQuery('nextras-mail-panel-attachment-id');
-
-		if ($action === 'detail' && is_string($messageId)) {
-			$this->handleDetail($messageId);
-
-		} elseif ($action === 'source' && is_string($messageId)) {
-			$this->handleSource($messageId);
-
-		} elseif ($action === 'attachment' && is_string($messageId) && ctype_digit($attachmentId)) {
-			$this->handleAttachment($messageId, $attachmentId);
-
-		} elseif ($action === 'delete-one' && is_string($messageId)) {
-			$this->handleDeleteOne($messageId);
-
-		} elseif ($action === 'delete-all') {
-			$this->handleDeleteAll();
-		}
+		$this->tryHandleRequest();
 	}
 
 
@@ -191,31 +173,56 @@ class MailPanel extends Object implements IBarPanel
 	/**
 	 * @return void
 	 */
-	private function returnBack()
+	private function tryHandleRequest()
 	{
-		header('Location: ' . $this->request->getReferer());
+		$action = $this->request->getQuery('nextras-mail-panel-action');
+		$messageId = $this->request->getQuery('nextras-mail-panel-message-id');
+		$attachmentId = $this->request->getQuery('nextras-mail-panel-attachment-id');
+
+		if ($action === 'detail' && is_string($messageId)) {
+			$this->handleDetail($messageId);
+
+		} elseif ($action === 'source' && is_string($messageId)) {
+			$this->handleSource($messageId);
+
+		} elseif ($action === 'attachment' && is_string($messageId) && ctype_digit($attachmentId)) {
+			$this->handleAttachment($messageId, $attachmentId);
+
+		} elseif ($action === 'delete-one' && is_string($messageId)) {
+			$this->handleDeleteOne($messageId);
+
+		} elseif ($action === 'delete-all') {
+			$this->handleDeleteAll();
+		}
+	}
+
+
+	/**
+	 * @param  string $messageId
+	 * @return void
+	 */
+	private function handleDetail($messageId)
+	{
+		$message = $this->mailer->getMessage($messageId);
+
+		header('Content-Type: text/html');
+		$latte = $this->getLatteEngine();
+		$latte->render(__DIR__ . '/MailPanel.body.latte', array('message' => $message));
 		exit;
 	}
 
 
 	/**
+	 * @param  string $messageId
 	 * @return void
 	 */
-	private function handleDeleteAll()
+	private function handleSource($messageId)
 	{
-		$this->mailer->deleteAll();
-		$this->returnBack();
-	}
+		$message = $this->mailer->getMessage($messageId);
 
-
-	/**
-	 * @param  int $id
-	 * @return void
-	 */
-	private function handleDeleteOne($id)
-	{
-		$this->mailer->deleteOne($id);
-		$this->returnBack();
+		header('Content-Type: text/plain');
+		echo $message->getEncodedMessage();
+		exit;
 	}
 
 
@@ -243,30 +250,37 @@ class MailPanel extends Object implements IBarPanel
 
 
 	/**
-	 * @param  string $messageId
+	 * @param  int $id
 	 * @return void
 	 */
-	private function handleSource($messageId)
+	private function handleDeleteOne($id)
 	{
-		$message = $this->mailer->getMessage($messageId);
-
-		header('Content-Type: text/plain');
-		echo $message->getEncodedMessage();
-		exit;
+		$this->mailer->deleteOne($id);
+		$this->returnBack();
 	}
 
 
 	/**
-	 * @param  string $messageId
 	 * @return void
 	 */
-	private function handleDetail($messageId)
+	private function handleDeleteAll()
 	{
-		$message = $this->mailer->getMessage($messageId);
+		$this->mailer->deleteAll();
+		$this->returnBack();
+	}
 
-		header('Content-Type: text/html');
-		$latte = $this->getLatteEngine();
-		$latte->render(__DIR__ . '/MailPanel.body.latte', array('message' => $message));
+
+	/**
+	 * @return void
+	 */
+	private function returnBack()
+	{
+		$url = $this->request->getReferer();
+		if ($url === NULL) {
+			throw new \RuntimeException('Unable to redirect back because your browser did not send referrer');
+		}
+
+		header('Location: ' . $url);
 		exit;
 	}
 }
