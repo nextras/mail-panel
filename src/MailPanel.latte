@@ -51,43 +51,43 @@
 				<tr>
 					<th>From</th>
 					<td>
-						{if isset($headers["From"])}
+						{ifset $headers["From"])}
 							{foreach $headers["From"] as $key => $value}
-								<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
+								<a href="mailto:{$key}">{ifset $value)}{$value}{else}{$key}{/ifset}</a>{sep}, {/sep}
 							{/foreach}
-						{/if}
+						{/ifset}
 					</td>
 				</tr>
 				<tr>
 					<th>To</th>
 					<td>
-						{if isset($headers["To"])}
+						{ifset $headers["To"])}
 							{foreach $headers["To"] as $key => $value}
-								<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
+								<a href="mailto:{$key}">{ifset $value)}{$value}{else}{$key}{/ifset}</a>{sep}, {/sep}
 							{/foreach}
-						{/if}
+						{/ifset}
 					</td>
 				</tr>
-				{if isset($headers["Cc"])}
+				{ifset $headers["Cc"])}
 					<tr>
 						<th>CC</th>
 						<td>
 							{foreach $headers["Cc"] as $key => $value}
-								<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
+								<a href="mailto:{$key}">{ifset $value)}{$value}{else}{$key}{/ifset}</a>{sep}, {/sep}
 							{/foreach}
 						</td>
 					</tr>
-				{/if}
-				{if isset($headers["Bcc"])}
+				{/ifset}
+				{ifset $headers["Bcc"])}
 					<tr>
 						<th>BCC</th>
 						<td>
 							{foreach $headers["Bcc"] as $key => $value}
-								<a href="mailto:{$key}">{if isset($value)}{$value}{else}{$key}{/if}</a>{sep}, {/sep}
+								<a href="mailto:{$key}">{ifset $value)}{$value}{else}{$key}{/ifset}</a>{sep}, {/sep}
 							{/foreach}
 						</td>
 					</tr>
-				{/if}
+				{/ifset}
 				{* Prepare mail content for display *}
 				{capture $mailContent}{include MailPanel_body.latte, message => $mail}{/capture}
 				<tr>
