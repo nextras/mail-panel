@@ -9,7 +9,7 @@
 namespace Nextras\MailPanel;
 
 use Latte;
-use Nette\Http\Request;
+use Nette\Http;
 use Nette\Mail\MimePart;
 use Nette\Object;
 use Nette\Utils\Strings;
@@ -24,7 +24,7 @@ class MailPanel extends Object implements IBarPanel
 	/** @const int */
 	const DEFAULT_COUNT = 5;
 
-	/** @var Request */
+	/** @var Http\Request */
 	private $request;
 
 	/** @var IPersistentMailer */
@@ -42,11 +42,11 @@ class MailPanel extends Object implements IBarPanel
 
 	/**
 	 * @param string            $tempDir
-	 * @param Request           $request
+	 * @param Http\Request      $request
 	 * @param IPersistentMailer $mailer
 	 * @param int               $messagesLimit
 	 */
-	public function __construct($tempDir, Request $request, IPersistentMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
+	public function __construct($tempDir, Http\Request $request, IPersistentMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
 		$this->tempDir = $tempDir;
 		$this->request = $request;
