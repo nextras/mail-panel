@@ -3,7 +3,7 @@
 [![Downloads this Month](https://img.shields.io/packagist/dm/nextras/mail-panel.svg?style=flat)](https://packagist.org/packages/nextras/mail-panel)
 [![Stable version](http://img.shields.io/packagist/v/nextras/mail-panel.svg?style=flat)](https://packagist.org/packages/nextras/mail-panel)
 
-Tracy panel which mocks Nette\Mail\IMailer and displays sent mails in Tracy.
+Nextras Mail Panel is an extension for [Nette Framework](https://nette.org) which captures sent e-mails in development mode and shows them in [Tracy](https://tracy.nette.org) bar.
 
 
 ### Screenshot
