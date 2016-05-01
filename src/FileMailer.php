@@ -32,9 +32,9 @@ class FileMailer extends Object implements IMailer
 	 */
 	public function __construct($tempDir)
 	{
-		$now = new DateTime();
+		$now = new DateTime('now');
 		$this->tempDir = $tempDir;
-		$this->prefix = $now->format("YmdHis") . '-';
+		$this->prefix = $now->format('YmdHis-');
 	}
 
 
