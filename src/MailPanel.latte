@@ -47,47 +47,19 @@
 						<a class="delete-link" href="{$baseUrl}?mail-panel={$index}">Delete</a>
 					</td>
 				</tr>
-				{var headers => $mail->getHeaders()}
-				<tr>
-					<th>From</th>
-					<td>
-						{ifset $headers["From"])}
-							{foreach $headers["From"] as $key => $value}
-								<a href="mailto:{$key}">{ifset $value)}{$value}{else}{$key}{/ifset}</a>{sep}, {/sep}
-							{/foreach}
-						{/ifset}
-					</td>
-				</tr>
-				<tr>
-					<th>To</th>
-					<td>
-						{ifset $headers["To"])}
-							{foreach $headers["To"] as $key => $value}
-								<a href="mailto:{$key}">{ifset $value)}{$value}{else}{$key}{/ifset}</a>{sep}, {/sep}
-							{/foreach}
-						{/ifset}
-					</td>
-				</tr>
-				{ifset $headers["Cc"])}
-					<tr>
-						<th>CC</th>
+
+				{foreach [From, To, Cc, Bcc] as $headerName}
+					{var $header = $mail->getHeader($headerName)}
+					<tr n:ifset="$header">
+						<th>{$headerName}</th>
 						<td>
-							{foreach $headers["Cc"] as $key => $value}
-								<a href="mailto:{$key}">{ifset $value)}{$value}{else}{$key}{/ifset}</a>{sep}, {/sep}
+							{foreach $header as $email => $name}
+								<a href="mailto:{$email}">{$name ?: $email}</a>{sep}, {/sep}
 							{/foreach}
 						</td>
 					</tr>
-				{/ifset}
-				{ifset $headers["Bcc"])}
-					<tr>
-						<th>BCC</th>
-						<td>
-							{foreach $headers["Bcc"] as $key => $value}
-								<a href="mailto:{$key}">{ifset $value)}{$value}{else}{$key}{/ifset}</a>{sep}, {/sep}
-							{/foreach}
-						</td>
-					</tr>
-				{/ifset}
+				{/foreach}
+
 				{* Prepare mail content for display *}
 				{capture $mailContent}{include MailPanel_body.latte, message => $mail}{/capture}
 				<tr>
