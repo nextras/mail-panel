@@ -9,8 +9,8 @@
 namespace Nextras\MailPanel;
 
 use Nette\Object;
-use Nette\InvalidStateException;
 use Nette\Utils\DateTime;
+use Nette\Utils\FileSystem;
 use Nette\Utils\Finder;
 use Nette\Mail\Message;
 
@@ -56,15 +56,8 @@ class FileMailer extends Object implements IMailer
 		/** @var Message $builtMail */
 		$builtMail = $reflectionMethod->invoke($message);
 
-		$file = $this->tempDir . '/' . $this->prefix . md5($builtMail->getHeader('Message-ID')) . '.mail';
-		$dir  = dirname($file);
-		if (!is_dir($dir)) {
-			mkdir($dir, 0777, TRUE);
-		}
-
-		if (!file_put_contents($file, serialize($builtMail))) {
-			throw new InvalidStateException("Unable to write email to '{$file}'.");
-		}
+		$path = $this->tempDir . '/' . $this->prefix . md5($builtMail->getHeader('Message-ID')) . '.mail';
+		FileSystem::write($path, serialize($builtMail));
 	}
 
 
@@ -104,7 +97,7 @@ class FileMailer extends Object implements IMailer
 			throw new \InvalidArgumentException('Undefined index');
 		}
 
-		@unlink($this->files[$index]);
+		FileSystem::delete($files[$index]);
 	}
 
 
@@ -115,7 +108,7 @@ class FileMailer extends Object implements IMailer
 	{
 		$this->findMails();
 		foreach ($this->files as $file) {
-			@unlink($file);
+			FileSystem::delete($file);
 		}
 	}
 
