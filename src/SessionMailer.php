@@ -16,7 +16,7 @@ use Nette\Mail\Message;
 /**
  * Session mailer - emails are stored into session
  */
-class SessionMailer implements IMailer
+class SessionMailer implements IPersistentMailer
 {
 	/** @var int */
 	private $limit;

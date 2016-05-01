@@ -27,7 +27,7 @@ class MailPanel extends Object implements IBarPanel
 	/** @var Request */
 	private $request;
 
-	/** @var IMailer */
+	/** @var IPersistentMailer */
 	private $mailer;
 
 	/** @var int */
@@ -41,12 +41,12 @@ class MailPanel extends Object implements IBarPanel
 
 
 	/**
-	 * @param string  $tempDir
-	 * @param Request $request
-	 * @param IMailer $mailer
-	 * @param int     $messagesLimit
+	 * @param string            $tempDir
+	 * @param Request           $request
+	 * @param IPersistentMailer $mailer
+	 * @param int               $messagesLimit
 	 */
-	public function __construct($tempDir, Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
+	public function __construct($tempDir, Request $request, IPersistentMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
 		$this->tempDir = $tempDir;
 		$this->request = $request;

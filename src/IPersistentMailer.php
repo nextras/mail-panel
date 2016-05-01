@@ -12,9 +12,9 @@ use Nette;
 
 
 /**
- * MailPanel's mailer which caches sends mails.
+ * Mailer which persists sent mails.
  */
-interface IMailer extends Nette\Mail\IMailer
+interface IPersistentMailer extends Nette\Mail\IMailer
 {
 	/**
 	 * @return int

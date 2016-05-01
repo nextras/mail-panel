@@ -19,7 +19,7 @@ use Nette\Utils\Strings;
 /**
  * File mailer - emails are stored into files
  */
-class FileMailer extends Object implements IMailer
+class FileMailer extends Object implements IPersistentMailer
 {
 	/** @var string */
 	private $tempDir;
