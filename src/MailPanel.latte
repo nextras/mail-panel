@@ -48,6 +48,8 @@
 			</tr>
 		</table>
 
+		{var $requestId = Nette\Utils\Random::generate()}
+
 		{foreach $messages as $messageId => $message}
 			<table>
 				<tr>
@@ -92,10 +94,10 @@
 				{capture $messageContent}{include MailPanel.body.latte, message => $message}{/capture}
 				<tr class="mail-preview-html tracy-collapsed">
 					<td colspan="2">
-						<iframe id="mail-preview-{$messageId}"></iframe>
+						<iframe id="mail-preview-{$requestId}-{$messageId}"></iframe>
 						<script type="text/javascript">
 							var mailContent = '<base target="_parent" />' + {$messageContent};
-							var iframe = document.getElementById('mail-preview-' + {$messageId});
+							var iframe = document.getElementById('mail-preview-' + {$requestId} + '-' + {$messageId});
 							var iframeDocument = iframe.contentWindow.document;
 
 							iframe.addEventListener('load', function () {
