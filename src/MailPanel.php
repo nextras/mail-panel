@@ -131,7 +131,9 @@ class MailPanel extends Object implements IBarPanel
 		if (!isset($this->latteEngine)) {
 			$this->latteEngine = new Latte\Engine();
 			$this->latteEngine->setTempDirectory($this->tempDir);
+			$this->latteEngine->setAutoRefresh(FALSE);
 		}
+
 		return $this->latteEngine;
 	}
 
