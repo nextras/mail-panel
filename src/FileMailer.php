@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This file is part of the Nextras\MailPanel library.
+ * @license    New BSD
+ * @link       https://github.com/nextras/mail-panel
+ */
+
 namespace Nextras\MailPanel;
 
 use Nette\Object;
@@ -11,9 +17,6 @@ use Nette\Mail\Message;
 
 /**
  * File mailer - emails are stored into files
- *
- * @author  Jan Skrasek
- * @license MIT
  */
 class FileMailer extends Object implements IMailer
 {
@@ -27,6 +30,9 @@ class FileMailer extends Object implements IMailer
 	private $files = array();
 
 
+	/**
+	 * @param string $tempDir
+	 */
 	public function __construct($tempDir)
 	{
 		$now = new DateTime();
@@ -37,6 +43,9 @@ class FileMailer extends Object implements IMailer
 
 	/**
 	 * Store mails to files.
+	 *
+	 * @param  Message $message
+	 * @return void
 	 */
 	public function send(Message $message)
 	{
@@ -59,6 +68,9 @@ class FileMailer extends Object implements IMailer
 	}
 
 
+	/**
+	 * @inheritdoc
+	 */
 	public function getMessageCount()
 	{
 		$this->findMails();
@@ -66,6 +78,9 @@ class FileMailer extends Object implements IMailer
 	}
 
 
+	/**
+	 * @inheritdoc
+	 */
 	public function getMessages($limit)
 	{
 		$this->findMails();
@@ -79,6 +94,9 @@ class FileMailer extends Object implements IMailer
 	}
 
 
+	/**
+	 * @inheritdoc
+	 */
 	public function deleteByIndex($index)
 	{
 		$this->findMails();
@@ -90,6 +108,9 @@ class FileMailer extends Object implements IMailer
 	}
 
 
+	/**
+	 * @inheritdoc
+	 */
 	public function clear()
 	{
 		$this->findMails();
@@ -99,6 +120,9 @@ class FileMailer extends Object implements IMailer
 	}
 
 
+	/**
+	 * @return Message[]
+	 */
 	private function findMails()
 	{
 		$this->files = array();

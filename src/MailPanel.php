@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This file is part of the Nextras\MailPanel library.
+ * @license    New BSD
+ * @link       https://github.com/nextras/mail-panel
+ */
+
 namespace Nextras\MailPanel;
 
 use Latte\Engine;
@@ -13,11 +19,7 @@ use Latte;
 
 
 /**
- * Extension for Nette debugger bar which shows sent emails
- *
- * @author Jan Drábek
- * @author Jan Marek
- * @copyright New BSD
+ * Extension for Tracy bar which shows sent emails
  */
 class MailPanel extends Object implements IBarPanel
 {
@@ -27,7 +29,7 @@ class MailPanel extends Object implements IBarPanel
 	/** @var Request */
 	private $request;
 
-	/** @var SessionMailer */
+	/** @var IMailer */
 	private $mailer;
 
 	/** @var int */
@@ -40,6 +42,12 @@ class MailPanel extends Object implements IBarPanel
 	private $latteEngine;
 
 
+	/**
+	 * @param string  $tempDir
+	 * @param Request $request
+	 * @param IMailer $mailer
+	 * @param int     $messagesLimit
+	 */
 	public function __construct($tempDir, Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
 		$this->request = $request;
@@ -57,13 +65,13 @@ class MailPanel extends Object implements IBarPanel
 		} elseif ($query === 'delete') {
 			$this->handleDeleteAll();
 		} elseif (is_numeric($query)) {
-			$this->handleDelete($query);
+			$this->handleDeleteOne($query);
 		}
 
 		$attachment = $request->getQuery("mail-panel-attachment");
 
 		if ($attachment !== NULL && $mailId !== NULL) {
-			$this->handleAttachment($attachment, $mailId);
+			$this->handleAttachment($mailId, $attachment);
 		}
 	}
 
@@ -99,8 +107,7 @@ class MailPanel extends Object implements IBarPanel
 
 
 	/**
-	 * Show content of panel
-	 * @return string
+	 * @inheritdoc
 	 */
 	public function getPanel()
 	{
@@ -112,6 +119,9 @@ class MailPanel extends Object implements IBarPanel
 		));
 	}
 
+	/**
+	 * @return Latte\Engine
+	 */
 	private function getLatteEngine()
 	{
 		if (!isset($this->latteEngine)) {
@@ -122,6 +132,9 @@ class MailPanel extends Object implements IBarPanel
 	}
 
 
+	/**
+	 * @return void
+	 */
 	private function returnBack()
 	{
 		header('Location: ' . $this->request->getReferer());
@@ -129,6 +142,9 @@ class MailPanel extends Object implements IBarPanel
 	}
 
 
+	/**
+	 * @return void
+	 */
 	private function handleDeleteAll()
 	{
 		$this->mailer->clear();
@@ -136,59 +152,83 @@ class MailPanel extends Object implements IBarPanel
 	}
 
 
-	private function handleDelete($id)
+	/**
+	 * @param  int $id
+	 * @return void
+	 */
+	private function handleDeleteOne($id)
 	{
 		$this->mailer->deleteByIndex($id);
 		$this->returnBack();
 	}
 
-	private function handleAttachment($id, $mailId)
+
+	/**
+	 * @param  int $mailId
+	 * @param  int $attachmentId
+	 */
+	private function handleAttachment($mailId, $attachmentId)
 	{
-		/** @var Message[] $list */
 		$list = $this->mailer->getMessages($this->messagesLimit);
 		if (!isset($list[$mailId])) {
 			return;
 		}
+
 		$attachments = $list[$mailId]->getAttachments();
-		if (!isset($attachments[$id])) {
+		if (!isset($attachments[$attachmentId])) {
 			return;
 		}
-		$attachment = $attachments[$id];
+
+		$attachment = $attachments[$attachmentId];
 		if (!$attachment->getHeader('Content-Type')) {
 			return;
 		}
+
 		header('Content-Type: ' . $attachment->getHeader('Content-Type'));
 		echo $attachment->getBody();
 		exit;
 	}
 
+
+	/**
+	 * @param  int $mailId
+	 * @return void
+	 */
 	private function handleSource($mailId)
 	{
-		/** @var Message[] $list */
 		$list = $this->mailer->getMessages($this->messagesLimit);
 		if (!isset($list[$mailId])) {
 			return;
 		}
+
 		header('Content-Type: text/plain');
 		echo $list[$mailId]->getEncodedMessage();
 		exit;
 	}
+
+
+	/**
+	 * @param  int $mailId
+	 * @return void
+	 */
 	private function handleDetail($mailId)
 	{
-		/** @var Message[] $list */
 		$list = $this->mailer->getMessages($this->messagesLimit);
 		if (!isset($list[$mailId])) {
 			return;
 		}
+
 		header('Content-Type: text/html');
 		$latte = $this->getLatteEngine();
-
-		$latte->render(__DIR__ . '/MailPanel_body.latte', array(
-			'message' => $list[$mailId],
-		));
+		$latte->render(__DIR__ . '/MailPanel_body.latte', array('message' => $list[$mailId]));
 		exit;
 	}
 
+
+	/**
+	 * @param  Message $message
+	 * @return mixed
+	 */
 	public static function extractPlainText(Message $message)
 	{
 		$propertyReflection = $message->getReflection()->getParentClass()->getProperty('parts');
@@ -202,9 +242,13 @@ class MailPanel extends Object implements IBarPanel
 		}
 	}
 
+
+	/**
+	 * @param  Message $message
+	 * @return bool
+	 */
 	public static function isPlainText(Message $message)
 	{
 		return $message->getHtmlBody() === NULL; // naive heuristic
 	}
-
 }

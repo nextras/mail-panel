@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This file is part of the Nextras\MailPanel library.
+ * @license    New BSD
+ * @link       https://github.com/nextras/mail-panel
+ */
+
 namespace Nextras\MailPanel;
 
 use Nette\Http\Session;
@@ -9,11 +15,6 @@ use Nette\Mail\Message;
 
 /**
  * Session mailer - emails are stored into session
- *
- * @author Jan Drábek
- * @author Jan Marek
- * @author Jan Skrasek
- * @license New BSD
  */
 class SessionMailer implements IMailer
 {
@@ -27,6 +28,11 @@ class SessionMailer implements IMailer
 	private $sessionSection;
 
 
+	/**
+	 * @param Session $session
+	 * @param int     $limit
+	 * @param string  $sectionName
+	 */
 	public function __construct(Session $session, $limit = 100, $sectionName = __CLASS__)
 	{
 		$this->limit = $limit;
@@ -59,6 +65,9 @@ class SessionMailer implements IMailer
 	}
 
 
+	/**
+	 * @inheritdoc
+	 */
 	public function getMessages($limit = NULL)
 	{
 		if ($this->canAccessSession() && isset($this->sessionSection->sentMessages)) {
@@ -68,8 +77,12 @@ class SessionMailer implements IMailer
 			return array();
 		}
 	}
-	
-	
+
+
+	/**
+	 * @param  Message[] $messages
+	 * @return void
+	 */
 	public function setMessages($messages)
 	{
 		if ($this->canAccessSession()) {
@@ -78,18 +91,27 @@ class SessionMailer implements IMailer
 	}
 
 
+	/**
+	 * @inheritdoc
+	 */
 	public function getMessageCount()
 	{
 		return count($this->getMessages());
 	}
 
 
+	/**
+	 * @inheritdoc
+	 */
 	public function clear()
 	{
 		$this->setMessages(array());
 	}
 
 
+	/**
+	 * @inheritdoc
+	 */
 	public function deleteByIndex($index)
 	{
 		if ($this->canAccessSession()) {
@@ -110,9 +132,11 @@ class SessionMailer implements IMailer
 	}
 
 
+	/**
+	 * @return bool
+	 */
 	private function canAccessSession()
 	{
 		return $this->session->isStarted();
 	}
-
 }
