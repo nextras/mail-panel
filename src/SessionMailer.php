@@ -15,6 +15,7 @@ use Nette\Mail\Message;
 
 /**
  * Session mailer - emails are stored into session
+ * @deprecated
  */
 class SessionMailer implements IPersistentMailer
 {
