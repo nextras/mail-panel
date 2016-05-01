@@ -26,9 +26,6 @@ class FileMailer extends Object implements IMailer
 	/** @var string */
 	private $prefix;
 
-	/** @var array */
-	private $files = array();
-
 
 	/**
 	 * @param string $tempDir
@@ -66,8 +63,7 @@ class FileMailer extends Object implements IMailer
 	 */
 	public function getMessageCount()
 	{
-		$this->findMails();
-		return count($this->files);
+		return count($this->findMails());
 	}
 
 
@@ -76,8 +72,7 @@ class FileMailer extends Object implements IMailer
 	 */
 	public function getMessages($limit)
 	{
-		$this->findMails();
-		$files = array_slice($this->files, 0, $limit);
+		$files = array_slice($this->findMails(), 0, $limit);
 		$mails = array();
 		foreach ($files as $file) {
 			$mails[] = unserialize(file_get_contents($file));
@@ -92,8 +87,8 @@ class FileMailer extends Object implements IMailer
 	 */
 	public function deleteByIndex($index)
 	{
-		$this->findMails();
-		if (!isset($this->files[$index])) {
+		$files = $this->findMails();
+		if (!isset($files[$index])) {
 			throw new \InvalidArgumentException('Undefined index');
 		}
 
@@ -106,8 +101,7 @@ class FileMailer extends Object implements IMailer
 	 */
 	public function clear()
 	{
-		$this->findMails();
-		foreach ($this->files as $file) {
+		foreach ($this->findMails() as $file) {
 			FileSystem::delete($file);
 		}
 	}
@@ -118,16 +112,14 @@ class FileMailer extends Object implements IMailer
 	 */
 	private function findMails()
 	{
-		$this->files = array();
+		$files = array();
 
-		if (!is_dir($this->tempDir)) {
-			return;
+		if (is_dir($this->tempDir)) {
+			foreach (Finder::findFiles('*.mail')->in($this->tempDir) as $file) {
+				$files[] = $file->getPathname();
+			}
 		}
 
-		$files = Finder::findFiles('*.mail')->in($this->tempDir);
-		foreach ($files as $file) {
-			$this->files[] = $file->getPathname();
-		}
+		return $files;
 	}
-
 }
