@@ -42,52 +42,26 @@ class SessionMailer implements IMailer
 
 
 	/**
-	 * Sends given message via this mailer
-	 * @param Message $mail
-	 */
-	public function send(Message $mail)
-	{
-		// get message with generated html instead of set FileTemplate etc
-		$reflectionMethod = $mail->getReflection()->getMethod('build');
-		$reflectionMethod->setAccessible(TRUE);
-		$builtMail = $reflectionMethod->invoke($mail);
-
-		if ($this->canAccessSession()) {
-			$mails = $this->getMessages();
-			if (count($mails) === $this->limit) {
-				array_pop($mails);
-			}
-			array_unshift($mails, $builtMail);
-			$this->setMessages($mails);
-		} else {
-			throw new \RuntimeException('Session is not started and you have already printed some contents.');
-		}
-	}
-
-
-	/**
-	 * @inheritdoc
-	 */
-	public function getMessages($limit = NULL)
-	{
-		if ($this->canAccessSession() && isset($this->sessionSection->sentMessages)) {
-			$messages = $this->sessionSection->sentMessages;
-			return array_slice($messages, 0, $limit);
-		} else {
-			return array();
-		}
-	}
-
-
-	/**
-	 * @param  Message[] $messages
+	 * Store mails to sessions.
+	 *
+	 * @param  Message $message
 	 * @return void
 	 */
-	public function setMessages($messages)
+	public function send(Message $message)
 	{
-		if ($this->canAccessSession()) {
-			$this->sessionSection->sentMessages = $messages;
-		}
+		// get message with generated html instead of set FileTemplate etc
+		$ref = new \ReflectionMethod('Nette\Mail\Message', 'build');
+		$ref->setAccessible(TRUE);
+
+		/** @var Message $builtMessage */
+		$builtMessage = $ref->invoke($message);
+
+		$this->requireSessions();
+		$hash = substr(md5($builtMessage->getHeader('Message-ID')), 0, 6);
+		$this->sessionSection->sentMessages = array_slice(
+			array($hash => $builtMessage) + $this->sessionSection->sentMessages,
+			0, $this->limit, TRUE
+		);
 	}
 
 
@@ -101,24 +75,55 @@ class SessionMailer implements IMailer
 
 
 	/**
-	 * @inheritdoc
+	 * @inheritDoc
 	 */
-	public function clear()
+	public function getMessage($messageId)
 	{
-		$this->setMessages(array());
+		$this->requireSessions();
+
+		if (!isset($this->sessionSection->sentMessages[$messageId])) {
+			throw new \RuntimeException("Unable to find mail with ID $messageId");
+		}
+
+		return $this->sessionSection->sentMessages[$messageId];
 	}
 
 
 	/**
 	 * @inheritdoc
 	 */
-	public function deleteByIndex($index)
+	public function getMessages($limit = NULL)
 	{
-		if ($this->canAccessSession()) {
-			$messages = $this->getMessages();
-			array_splice($messages, (int) $index, 1);
-			$this->setMessages($messages);
+		if ($this->session->isStarted() && isset($this->sessionSection->sentMessages)) {
+			$messages = $this->sessionSection->sentMessages;
+			return array_slice($messages, 0, $limit, TRUE);
+
+		} else {
+			return array();
 		}
+	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	public function deleteOne($messageId)
+	{
+		$this->requireSessions();
+		if (!isset($this->sessionSection->sentMessages[$messageId])) {
+			throw new \RuntimeException("Unable to find mail with ID $messageId");
+		}
+
+		unset($this->sessionSection->sentMessages[$messageId]);
+	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	public function deleteAll()
+	{
+		$this->sessionSection->sentMessages = array();
 	}
 
 
@@ -133,10 +138,16 @@ class SessionMailer implements IMailer
 
 
 	/**
-	 * @return bool
+	 * @return void
 	 */
-	private function canAccessSession()
+	private function requireSessions()
 	{
-		return $this->session->isStarted();
+		if (!$this->session->isStarted()) {
+			throw new \RuntimeException('Session is not started, start session or use FileMailer instead.');
+		}
+
+		if (!isset($this->sessionSection->sentMessages)) {
+			$this->sessionSection->sentMessages = array();
+		}
 	}
 }

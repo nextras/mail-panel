@@ -95,7 +95,7 @@
 						<iframe id="mail-preview-{$messageId}"></iframe>
 						<script type="text/javascript">
 							var mailContent = '<base target="_parent" />' + {$messageContent};
-							var iframe = document.getElementById('mail-preview-{$messageId}');
+							var iframe = document.getElementById('mail-preview-' + {$messageId});
 							var iframeDocument = iframe.contentWindow.document;
 
 							iframe.addEventListener('load', function () {

@@ -10,7 +10,6 @@ namespace Nextras\MailPanel;
 
 use Latte;
 use Nette\Http\Request;
-use Nette\Mail\Message;
 use Nette\Mail\MimePart;
 use Nette\Object;
 use Nette\Utils\Strings;
@@ -57,16 +56,16 @@ class MailPanel extends Object implements IBarPanel
 		$query = $request->getQuery('mail-panel');
 		$mailId = $request->getQuery('mail-panel-mail');
 
-		if ($query === 'detail' && ctype_digit($mailId)) {
+		if ($query === 'detail' && is_string($mailId)) {
 			$this->handleDetail($mailId);
 
-		} elseif ($query === 'source' && ctype_digit($mailId)) {
+		} elseif ($query === 'source' && is_string($mailId)) {
 			$this->handleSource($mailId);
 
 		} elseif ($query === 'delete') {
 			$this->handleDeleteAll();
 
-		} elseif (ctype_digit($query)) {
+		} elseif (is_string($query)) {
 			$this->handleDeleteOne($query);
 		}
 
@@ -182,7 +181,7 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	private function handleDeleteAll()
 	{
-		$this->mailer->clear();
+		$this->mailer->deleteAll();
 		$this->returnBack();
 	}
 
@@ -193,7 +192,7 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	private function handleDeleteOne($id)
 	{
-		$this->mailer->deleteByIndex($id);
+		$this->mailer->deleteOne($id);
 		$this->returnBack();
 	}
 

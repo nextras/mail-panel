@@ -23,6 +23,13 @@ interface IMailer extends Nette\Mail\IMailer
 
 
 	/**
+	 * @param  string $messageId
+	 * @return Nette\Mail\Message
+	 */
+	public function getMessage($messageId);
+
+
+	/**
 	 * @param  int $limit
 	 * @return Nette\Mail\Message[]
 	 */
@@ -30,14 +37,14 @@ interface IMailer extends Nette\Mail\IMailer
 
 
 	/**
+	 * @param  string $messageId
 	 * @return void
 	 */
-	public function clear();
+	public function deleteOne($messageId);
 
 
 	/**
-	 * @param  int $index
 	 * @return void
 	 */
-	public function deleteByIndex($index);
+	public function deleteAll();
 }

@@ -8,11 +8,12 @@
 
 namespace Nextras\MailPanel;
 
+use Nette;
 use Nette\Object;
-use Nette\Utils\DateTime;
 use Nette\Utils\FileSystem;
 use Nette\Utils\Finder;
 use Nette\Mail\Message;
+use Nette\Utils\Strings;
 
 
 /**
@@ -23,18 +24,13 @@ class FileMailer extends Object implements IMailer
 	/** @var string */
 	private $tempDir;
 
-	/** @var string */
-	private $prefix;
-
 
 	/**
 	 * @param string $tempDir
 	 */
 	public function __construct($tempDir)
 	{
-		$now = new DateTime('now');
 		$this->tempDir = $tempDir;
-		$this->prefix = $now->format('YmdHis-');
 	}
 
 
@@ -47,14 +43,16 @@ class FileMailer extends Object implements IMailer
 	public function send(Message $message)
 	{
 		// get message with generated html instead of set FileTemplate etc
-		$reflectionMethod = $message->getReflection()->getMethod('build');
-		$reflectionMethod->setAccessible(TRUE);
+		$ref = new \ReflectionMethod('Nette\Mail\Message', 'build');
+		$ref->setAccessible(TRUE);
 
 		/** @var Message $builtMail */
-		$builtMail = $reflectionMethod->invoke($message);
+		$builtMessage = $ref->invoke($message);
 
-		$path = $this->tempDir . '/' . $this->prefix . md5($builtMail->getHeader('Message-ID')) . '.mail';
-		FileSystem::write($path, serialize($builtMail));
+		$time = date('YmdHis');
+		$hash = substr(md5($builtMessage->getHeader('Message-ID')), 0, 6);
+		$path = "{$this->tempDir}/{$time}-{$hash}.mail";
+		FileSystem::write($path, serialize($builtMessage));
 	}
 
 
@@ -68,15 +66,26 @@ class FileMailer extends Object implements IMailer
 
 
 	/**
+	 * @inheritDoc
+	 */
+	public function getMessage($messageId)
+	{
+		$files = $this->findMails();
+		if (!isset($files[$messageId])) {
+			throw new \RuntimeException("Unable to find mail with ID $messageId");
+		}
+
+		return $this->readMail($files[$messageId]);
+	}
+
+
+	/**
 	 * @inheritdoc
 	 */
 	public function getMessages($limit)
 	{
-		$files = array_slice($this->findMails(), 0, $limit);
-		$mails = array();
-		foreach ($files as $file) {
-			$mails[] = unserialize(file_get_contents($file));
-		}
+		$files = array_slice($this->findMails(), 0, $limit, TRUE);
+		$mails = array_map(array($this, 'readMail'), $files);
 
 		return $mails;
 	}
@@ -85,21 +94,21 @@ class FileMailer extends Object implements IMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function deleteByIndex($index)
+	public function deleteOne($messageId)
 	{
 		$files = $this->findMails();
-		if (!isset($files[$index])) {
-			throw new \InvalidArgumentException('Undefined index');
+		if (!isset($files[$messageId])) {
+			throw new \RuntimeException("Unable to find mail with ID $messageId");
 		}
 
-		FileSystem::delete($files[$index]);
+		FileSystem::delete($files[$messageId]);
 	}
 
 
 	/**
 	 * @inheritdoc
 	 */
-	public function clear()
+	public function deleteAll()
 	{
 		foreach ($this->findMails() as $file) {
 			FileSystem::delete($file);
@@ -108,18 +117,39 @@ class FileMailer extends Object implements IMailer
 
 
 	/**
-	 * @return Message[]
+	 * @return string[]
 	 */
 	private function findMails()
 	{
 		$files = array();
 
 		if (is_dir($this->tempDir)) {
+			/** @var \SplFileInfo $file */
 			foreach (Finder::findFiles('*.mail')->in($this->tempDir) as $file) {
-				$files[] = $file->getPathname();
+				if ($matches = Strings::match($file->getBasename('.mail'), '#^\d+[-](\w+)\z#')) {
+					$messageId = $matches[1];
+					$files[$messageId] = $file->getPathname();
+				}
 			}
+
+			arsort($files);
 		}
 
 		return $files;
+	}
+
+
+	/**
+	 * @param  string $path
+	 * @return Nette\Mail\Message
+	 */
+	private function readMail($path)
+	{
+		$message = unserialize(file_get_contents($path));
+		if (!$message instanceof Message) {
+			throw new \RuntimeException("Unable to deserialize message from file '$path'");
+		}
+
+		return $message;
 	}
 }
