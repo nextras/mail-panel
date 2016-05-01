@@ -8,14 +8,13 @@
 
 namespace Nextras\MailPanel;
 
-use Latte\Engine;
+use Latte;
 use Nette\Http\Request;
 use Nette\Mail\Message;
 use Nette\Mail\MimePart;
 use Nette\Object;
 use Nette\Utils\Strings;
 use Tracy\IBarPanel;
-use Latte;
 
 
 /**
@@ -38,7 +37,7 @@ class MailPanel extends Object implements IBarPanel
 	/** @var string|NULL */
 	private $tempDir;
 
-	/** @var Engine */
+	/** @var Latte\Engine */
 	private $latteEngine;
 
 
@@ -50,25 +49,28 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	public function __construct($tempDir, Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
+		$this->tempDir = $tempDir;
 		$this->request = $request;
 		$this->mailer = $mailer;
 		$this->messagesLimit = $messagesLimit;
-		$this->tempDir = $tempDir;
 
-		$query = $request->getQuery("mail-panel");
-		$mailId = $request->getQuery("mail-panel-mail");
+		$query = $request->getQuery('mail-panel');
+		$mailId = $request->getQuery('mail-panel-mail');
 
-		if ($query === 'detail' && is_numeric($mailId)) {
+		if ($query === 'detail' && ctype_digit($mailId)) {
 			$this->handleDetail($mailId);
-		} elseif ($query === 'source' && is_numeric($mailId)) {
+
+		} elseif ($query === 'source' && ctype_digit($mailId)) {
 			$this->handleSource($mailId);
+
 		} elseif ($query === 'delete') {
 			$this->handleDeleteAll();
-		} elseif (is_numeric($query)) {
+
+		} elseif (ctype_digit($query)) {
 			$this->handleDeleteOne($query);
 		}
 
-		$attachment = $request->getQuery("mail-panel-attachment");
+		$attachment = $request->getQuery('mail-panel-attachment');
 
 		if ($attachment !== NULL && $mailId !== NULL) {
 			$this->handleAttachment($mailId, $attachment);
@@ -93,6 +95,7 @@ class MailPanel extends Object implements IBarPanel
 	public function getTab()
 	{
 		$count = $this->mailer->getMessageCount();
+		$label = $count . ' sent email' . ($count === 1 ? '' : 's');
 
 		return '<span title="Mail Panel">' .
 			'<svg viewBox="0 0 16 16">' .
@@ -102,7 +105,7 @@ class MailPanel extends Object implements IBarPanel
   			'	<path d="M 2 11 l 4 -4 q 2 -2 4 0 l 4 4" stroke="#bbccdd" fill="none"/>' .
   			'	<path d="M 2 4 l 4 4 q 2 2 4 0 l 4 -4" stroke="#85aae2" fill="#dee8f7"/>' .
 			'</svg>' .
-			'<span class="tracy-label">' . $count . ' sent email' . ($count === 1 ? '' : 's') . '</span></span>';
+			'<span class="tracy-label">' . $label . '</span></span>';
 	}
 
 
@@ -119,13 +122,14 @@ class MailPanel extends Object implements IBarPanel
 		));
 	}
 
+
 	/**
 	 * @return Latte\Engine
 	 */
 	private function getLatteEngine()
 	{
 		if (!isset($this->latteEngine)) {
-			$this->latteEngine = new Engine;
+			$this->latteEngine = new Latte\Engine();
 			$this->latteEngine->setTempDirectory($this->tempDir);
 		}
 		return $this->latteEngine;
