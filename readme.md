@@ -13,26 +13,22 @@ Nextras Mail Panel is an extension for [Nette Framework](https://nette.org) whic
 
 ### Installation
 
-Install library via composer:
+1. Install library via composer:
 
-```bash
-composer require nextras/mail-panel
-```
+	```bash
+	composer require nextras/mail-panel
+	```
 
-Mailer has to be set as service "nette.mailer" in development configuration.
+2. Update your local configuration (e.g. `config.local.neon`) to register Mail Panel to Tracy<br>and to change default mailer to `Nextras\MailPanel\FileMailer`.
 
-```yml
-services:
-	nette.mailer: Nextras\MailPanel\FileMailer(%tempDir%/mail-panel/mails)
-```
+	```yml
+	tracy:
+		bar:
+			- Nextras\MailPanel\MailPanel(%tempDir%/mail-panel/latte)
 
-Add MailPanel to Tracy bar:
-
-```yml
-tracy:
-	bar:
-		- Nextras\MailPanel\MailPanel(%tempDir%/mail-panel/latte)
-```
+	services:
+		nette.mailer: Nextras\MailPanel\FileMailer(%tempDir%/mail-panel/mails)
+	```
 
 
 ### Usage
