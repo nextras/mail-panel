@@ -17,20 +17,20 @@
 		width: 80px;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] a.action-link {
+	#tracy-debug .tracy-panel[id$=MailPanel] a.nextras-mail-panel-action {
 		float: right;
 		margin-left: 10px;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] .mail-preview-txt td {
+	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-preview-txt td {
 		white-space: pre;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] .mail-preview-html td {
+	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-preview-html td {
 		padding: 0;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] .mail-preview-html iframe {
+	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-preview-html iframe {
 		width: 100%;
 		background: #FFF;
 	}
@@ -44,7 +44,7 @@
 		<table>
 			<tr>
 				<th colspan="2">
-					<a class="action-link" href="{link delete-all}">Delete all</a>
+					<a class="nextras-mail-panel-action" href="{link delete-all}">Delete all</a>
 				</th>
 			</tr>
 		</table>
@@ -54,11 +54,11 @@
 				<tr>
 					<th colspan="2">
 						<span title="Sent at {$message->getHeader('Date')}">{$message->subject}</span>
-						<a class="action-link" href="{link delete-one, message-id => $messageId}">Delete</a>
-						<a class="action-link" target="_blank" href="{link source, message-id => $messageId}">Source</a>
-						<a class="action-link" target="_blank" href="{link detail, message-id => $messageId}">Open</a>
-						<a class="action-link tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .mail-preview-html">Preview HTML</a>
-						<a class="action-link tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .mail-preview-txt">Preview TXT</a>
+						<a class="nextras-mail-panel-action" href="{link delete-one, message-id => $messageId}">Delete</a>
+						<a class="nextras-mail-panel-action" target="_blank" href="{link source, message-id => $messageId}">Source</a>
+						<a class="nextras-mail-panel-action" target="_blank" href="{link detail, message-id => $messageId}">Open</a>
+						<a class="nextras-mail-panel-action tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .nextras-mail-panel-preview-html">Preview HTML</a>
+						<a class="nextras-mail-panel-action tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .nextras-mail-panel-preview-txt">Preview TXT</a>
 					</th>
 				</tr>
 
@@ -86,11 +86,11 @@
 				</tr>
 
 
-				<tr class="mail-preview-txt tracy-collapsed">
+				<tr class="nextras-mail-panel-preview-txt tracy-collapsed">
 					<td colspan="2">{$message|plainText}</td>
 				</tr>
 
-				<tr class="mail-preview-html tracy-collapsed">
+				<tr class="nextras-mail-panel-preview-html tracy-collapsed">
 					<td colspan="2">
 						<iframe data-content="{include MailPanel.body.latte, message => $message|escape}"></iframe>
 					</td>
@@ -102,7 +102,7 @@
 			(function () {
 
 				var panel = document.getElementById('nextras-mail-panel-' + {$requestId});
-				var iframes = panel.querySelectorAll('.mail-preview-html iframe');
+				var iframes = panel.getElementsByTagName('iframe');
 
 				for (var i = 0; i < iframes.length; i++) {
 					(function (iframe) {
