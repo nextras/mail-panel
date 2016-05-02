@@ -24,10 +24,10 @@ Nextras Mail Panel is an extension for [Nette Framework](https://nette.org) whic
 	```yml
 	tracy:
 		bar:
-			- Nextras\MailPanel\MailPanel(%tempDir%/mail-panel/latte)
+			- Nextras\MailPanel\MailPanel(%tempDir%/mail-panel-latte)
 
 	services:
-		nette.mailer: Nextras\MailPanel\FileMailer(%tempDir%/mail-panel/mails)
+		nette.mailer: Nextras\MailPanel\FileMailer(%tempDir%/mail-panel-mails)
 	```
 
 
