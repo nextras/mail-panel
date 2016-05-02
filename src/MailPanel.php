@@ -13,6 +13,7 @@ use Nette\Http;
 use Nette\Mail\MimePart;
 use Nette\Object;
 use Nette\Utils\Strings;
+use Tracy\Debugger;
 use Tracy\IBarPanel;
 
 
@@ -175,6 +176,10 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	private function tryHandleRequest()
 	{
+		if (Debugger::$productionMode !== FALSE) {
+			return;
+		}
+
 		$action = $this->request->getQuery('nextras-mail-panel-action');
 		$messageId = $this->request->getQuery('nextras-mail-panel-message-id');
 		$attachmentId = $this->request->getQuery('nextras-mail-panel-attachment-id');
