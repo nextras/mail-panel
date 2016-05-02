@@ -32,14 +32,15 @@
 
 	#tracy-debug .tracy-panel[id$=MailPanel] .mail-preview-html iframe {
 		width: 100%;
-		min-height: 200px;
 		background: #FFF;
 	}
 </style>
 
 <h1>Sent emails</h1>
 {if count($messages) > 0}
-	<div class="tracy-inner">
+
+	{var $requestId = Nette\Utils\Random::generate()}
+	<div class="tracy-inner" id="nextras-mail-panel-{$requestId}">
 		<table>
 			<tr>
 				<th colspan="2">
@@ -47,8 +48,6 @@
 				</th>
 			</tr>
 		</table>
-
-		{var $requestId = Nette\Utils\Random::generate()}
 
 		{foreach $messages as $messageId => $message}
 			<table>
@@ -91,30 +90,44 @@
 					<td colspan="2">{$message|plainText}</td>
 				</tr>
 
-				{capture $messageContent}{include MailPanel.body.latte, message => $message}{/capture}
 				<tr class="mail-preview-html tracy-collapsed">
 					<td colspan="2">
-						<iframe id="mail-preview-{$requestId}-{$messageId}"></iframe>
-						<script type="text/javascript">
-							var mailContent = '<base target="_parent" />' + {$messageContent};
-							var iframe = document.getElementById('mail-preview-' + {$requestId} + '-' + {$messageId});
-							var iframeDocument = iframe.contentWindow.document;
-
-							iframe.addEventListener('load', function () {
-								if (iframeDocument.body.scrollHeight >= 34) {
-									iframe.style.height = iframeDocument.body.scrollHeight + 'px';
-								} else {
-									iframe.style.height = 'auto'; // fallback when scrollHeight is broken
-								}
-							});
-
-							iframeDocument.write(mailContent);
-							iframeDocument.close();
-						</script>
+						<iframe data-content="{include MailPanel.body.latte, message => $message|escape}"></iframe>
 					</td>
 				</tr>
 			</table>
 		{/foreach}
+
+		<script>
+			(function () {
+
+				var panel = document.getElementById('nextras-mail-panel-' + {$requestId});
+				var iframes = panel.querySelectorAll('.mail-preview-html iframe');
+
+				for (var i = 0; i < iframes.length; i++) {
+					(function (iframe) {
+
+						iframe.contentWindow.document.write(iframe.dataset.content);
+						iframe.contentWindow.document.close();
+						delete iframe.dataset.content;
+
+						var baseTag = iframe.contentWindow.document.createElement('base');
+						baseTag.target = '_parent';
+						iframe.contentWindow.document.body.appendChild(baseTag);
+
+						var fixHeight = function () {
+							iframe.style.height = 0;
+							iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+							iframe.contentWindow.removeEventListener('resize', fixHeight);
+						};
+
+						iframe.contentWindow.addEventListener('resize', fixHeight);
+
+					})(iframes.item(i));
+				}
+
+			})();
+		</script>
 	</div>
 {else}
 	<p>No emails.</p>
