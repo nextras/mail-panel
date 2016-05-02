@@ -17,9 +17,12 @@
 		width: 80px;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] a.nextras-mail-panel-action {
+	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-actions {
 		float: right;
-		margin-left: 10px;
+	}
+
+	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-actions a {
+		margin-left: 7px;
 	}
 
 	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-preview-txt td {
@@ -44,7 +47,9 @@
 		<table>
 			<tr>
 				<th colspan="2">
-					<a class="nextras-mail-panel-action" href="{link delete-all}">Delete all</a>
+					<div class="nextras-mail-panel-actions">
+						<a class="nextras-mail-panel-action" href="{link delete-all}">Delete all</a>
+					</div>
 				</th>
 			</tr>
 		</table>
@@ -53,12 +58,14 @@
 			<table>
 				<tr>
 					<th colspan="2">
-						<span title="Sent at {$message->getHeader('Date')}">{$message->subject}</span>
-						<a class="nextras-mail-panel-action" href="{link delete-one, message-id => $messageId}">Delete</a>
-						<a class="nextras-mail-panel-action" target="_blank" href="{link source, message-id => $messageId}">Source</a>
-						<a class="nextras-mail-panel-action" target="_blank" href="{link detail, message-id => $messageId}">Open</a>
-						<a class="nextras-mail-panel-action tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .nextras-mail-panel-preview-html">Preview HTML</a>
-						<a class="nextras-mail-panel-action tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .nextras-mail-panel-preview-txt">Preview TXT</a>
+						<div class="nextras-mail-panel-actions">
+							<a class="tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .nextras-mail-panel-preview-txt">Preview TXT</a>
+							<a class="tracy-toggle tracy-collapsed" href="#" data-tracy-ref="^table .nextras-mail-panel-preview-html">Preview HTML</a>
+							<a target="_blank" href="{link detail, message-id => $messageId}">Open</a>
+							<a target="_blank" href="{link source, message-id => $messageId}">Source</a>
+							<a href="{link delete-one, message-id => $messageId}">Delete</a>
+						</div>
+						<div class="nextras-mail-panel-subject" title="Sent at {$message->getHeader('Date')}">{$message->subject}</div>
 					</th>
 				</tr>
 
