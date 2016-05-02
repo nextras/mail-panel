@@ -280,12 +280,17 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	private function returnBack()
 	{
-		$url = $this->request->getReferer();
-		if ($url === NULL) {
+		$currentUrl = $this->request->getUrl();
+		$refererUrl = $this->request->getReferer();
+
+		if ($refererUrl === NULL) {
 			throw new \RuntimeException('Unable to redirect back because your browser did not send referrer');
+
+		} elseif ($refererUrl->isEqual($currentUrl)) {
+			throw new \RuntimeException('Unable to redirect back because it would create loop');
 		}
 
-		header('Location: ' . $url);
+		header('Location: ' . $refererUrl);
 		exit;
 	}
 }
