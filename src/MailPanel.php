@@ -38,7 +38,7 @@ class MailPanel extends Object implements IBarPanel
 	private $tempDir;
 
 	/** @var Latte\Engine */
-	private $latteEngine;
+	private $latte;
 
 
 	/**
@@ -84,9 +84,7 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	public function getPanel()
 	{
-		$latte = $this->getLatteEngine();
-
-		return $latte->renderToString(__DIR__ . '/MailPanel.latte', array(
+		return $this->getLatte()->renderToString(__DIR__ . '/MailPanel.latte', array(
 			'getLink' => array($this, 'getLink'),
 			'panelId' => substr(md5(uniqid('', TRUE)), 0, 6),
 			'messages' => $this->mailer->getMessages($this->messagesLimit),
@@ -118,26 +116,26 @@ class MailPanel extends Object implements IBarPanel
 	/**
 	 * @return Latte\Engine
 	 */
-	private function getLatteEngine()
+	private function getLatte()
 	{
-		if (!isset($this->latteEngine)) {
-			$this->latteEngine = new Latte\Engine();
-			$this->latteEngine->setTempDirectory($this->tempDir);
-			$this->latteEngine->setAutoRefresh(FALSE);
+		if (!isset($this->latte)) {
+			$this->latte = new Latte\Engine();
+			$this->latte->setTempDirectory($this->tempDir);
+			$this->latte->setAutoRefresh(FALSE);
 
-			$this->latteEngine->onCompile[] = function (Latte\Engine $engine) {
-				$set = new Latte\Macros\MacroSet($engine->getCompiler());
+			$this->latte->onCompile[] = function (Latte\Engine $latte) {
+				$set = new Latte\Macros\MacroSet($latte->getCompiler());
 				$set->addMacro('link', 'echo %escape(call_user_func($getLink, %node.word, %node.array))');
 			};
 
-			$this->latteEngine->addFilter('attachmentLabel', function (MimePart $attachment) {
+			$this->latte->addFilter('attachmentLabel', function (MimePart $attachment) {
 				$contentDisposition = $attachment->getHeader('Content-Disposition');
 				$contentType = $attachment->getHeader('Content-Type');
-				$matches  = Strings::match($contentDisposition, '#filename="(.+?)"#');
+				$matches = Strings::match($contentDisposition, '#filename="(.+?)"#');
 				return ($matches ? "$matches[1] " : '') . "($contentType)";
 			});
 
-			$this->latteEngine->addFilter('plainText', function (MimePart $part) {
+			$this->latte->addFilter('plainText', function (MimePart $part) {
 				$ref = new \ReflectionProperty('Nette\Mail\MimePart', 'parts');
 				$ref->setAccessible(TRUE);
 
@@ -158,7 +156,7 @@ class MailPanel extends Object implements IBarPanel
 			});
 		}
 
-		return $this->latteEngine;
+		return $this->latte;
 	}
 
 
@@ -202,8 +200,7 @@ class MailPanel extends Object implements IBarPanel
 		$message = $this->mailer->getMessage($messageId);
 
 		header('Content-Type: text/html');
-		$latte = $this->getLatteEngine();
-		$latte->render(__DIR__ . '/MailPanel.body.latte', array('message' => $message));
+		$this->getLatte()->render(__DIR__ . '/MailPanel.body.latte', array('message' => $message));
 		exit;
 	}
 
