@@ -40,10 +40,10 @@
 </style>
 
 <h1>Sent emails</h1>
+
 {if count($messages) > 0}
 
-	{var $requestId = Nette\Utils\Random::generate()}
-	<div class="tracy-inner" id="nextras-mail-panel-{$requestId}">
+	<div class="tracy-inner" id="nextras-mail-panel-{$panelId}">
 		<table>
 			<tr>
 				<th colspan="2">
@@ -108,7 +108,7 @@
 		<script>
 			(function () {
 
-				var panel = document.getElementById('nextras-mail-panel-' + {$requestId});
+				var panel = document.getElementById('nextras-mail-panel-' + {$panelId});
 				var iframes = panel.getElementsByTagName('iframe');
 
 				for (var i = 0; i < iframes.length; i++) {

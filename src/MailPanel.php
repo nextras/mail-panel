@@ -98,6 +98,7 @@ class MailPanel extends Object implements IBarPanel
 
 		return $latte->renderToString(__DIR__ . '/MailPanel.latte', array(
 			'getLink' => array($this, 'getLink'),
+			'panelId' => substr(md5(uniqid('', TRUE)), 0, 6),
 			'messages' => $this->mailer->getMessages($this->messagesLimit),
 		));
 	}
