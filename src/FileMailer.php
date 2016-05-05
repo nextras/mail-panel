@@ -127,18 +127,11 @@ class FileMailer extends Object implements IPersistentMailer
 	{
 		if ($this->files === NULL) {
 			$this->files = array();
-
-			if (is_dir($this->tempDir)) {
-				/** @var \SplFileInfo $file */
-				foreach (Finder::findFiles('*.mail')->in($this->tempDir) as $file) {
-					if ($matches = Strings::match($file->getBasename('.mail'), '#^\d+[-](\w+)\z#')) {
-						$messageId = $matches[1];
-						$this->files[$messageId] = $file->getPathname();
-					}
-				}
-
-				arsort($this->files);
+			foreach (glob("{$this->tempDir}/*.mail") as $file) {
+				$messageId = substr($file, -11, 6);
+				$this->files[$messageId] = $file;
 			}
+			arsort($this->files);
 		}
 
 		return $this->files;
