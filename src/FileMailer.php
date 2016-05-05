@@ -102,7 +102,7 @@ class FileMailer extends Object implements IPersistentMailer
 	{
 		$files = $this->findFiles();
 		if (!isset($files[$messageId])) {
-			throw new \RuntimeException("Unable to find mail with ID $messageId");
+			return; // assume that mail was already deleted
 		}
 
 		FileSystem::delete($files[$messageId]);
