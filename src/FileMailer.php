@@ -24,6 +24,9 @@ class FileMailer extends Object implements IPersistentMailer
 	/** @var string */
 	private $tempDir;
 
+	/** @var string[]|NULL */
+	private $files;
+
 
 	/**
 	 * @param string $tempDir
@@ -53,6 +56,7 @@ class FileMailer extends Object implements IPersistentMailer
 		$hash = substr(md5($builtMessage->getHeader('Message-ID')), 0, 6);
 		$path = "{$this->tempDir}/{$time}-{$hash}.mail";
 		FileSystem::write($path, serialize($builtMessage));
+		$this->files = NULL;
 	}
 
 
@@ -121,21 +125,23 @@ class FileMailer extends Object implements IPersistentMailer
 	 */
 	private function findFiles()
 	{
-		$files = array();
+		if ($this->files === NULL) {
+			$this->files = array();
 
-		if (is_dir($this->tempDir)) {
-			/** @var \SplFileInfo $file */
-			foreach (Finder::findFiles('*.mail')->in($this->tempDir) as $file) {
-				if ($matches = Strings::match($file->getBasename('.mail'), '#^\d+[-](\w+)\z#')) {
-					$messageId = $matches[1];
-					$files[$messageId] = $file->getPathname();
+			if (is_dir($this->tempDir)) {
+				/** @var \SplFileInfo $file */
+				foreach (Finder::findFiles('*.mail')->in($this->tempDir) as $file) {
+					if ($matches = Strings::match($file->getBasename('.mail'), '#^\d+[-](\w+)\z#')) {
+						$messageId = $matches[1];
+						$this->files[$messageId] = $file->getPathname();
+					}
 				}
-			}
 
-			arsort($files);
+				arsort($this->files);
+			}
 		}
 
-		return $files;
+		return $this->files;
 	}
 
 
