@@ -127,7 +127,7 @@ class MailPanel extends Object implements IBarPanel
 
 			$this->latteEngine->onCompile[] = function (Latte\Engine $engine) {
 				$set = new Latte\Macros\MacroSet($engine->getCompiler());
-				$set->addMacro('link', 'echo %escape($getLink(%node.word, %node.array))');
+				$set->addMacro('link', 'echo %escape(call_user_func($getLink, %node.word, %node.array))');
 			};
 
 			$this->latteEngine->addFilter('attachmentLabel', function (MimePart $attachment) {
