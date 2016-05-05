@@ -42,7 +42,7 @@ class MailPanel extends Object implements IBarPanel
 
 
 	/**
-	 * @param string            $tempDir
+	 * @param string|NULL       $tempDir
 	 * @param Http\Request      $request
 	 * @param IPersistentMailer $mailer
 	 * @param int               $messagesLimit
