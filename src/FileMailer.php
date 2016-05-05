@@ -144,9 +144,14 @@ class FileMailer extends Object implements IPersistentMailer
 	 */
 	private function readMail($path)
 	{
-		$message = unserialize(file_get_contents($path));
+		$content = file_get_contents($path);
+		if ($content === FALSE) {
+			throw new \RuntimeException("Unable to read message stored in file '$path'");
+		}
+
+		$message = unserialize($content);
 		if (!$message instanceof Message) {
-			throw new \RuntimeException("Unable to deserialize message from file '$path'");
+			throw new \RuntimeException("Unable to deserialize message stored in file '$path'");
 		}
 
 		return $message;
