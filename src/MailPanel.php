@@ -59,16 +59,6 @@ class MailPanel extends Object implements IBarPanel
 
 
 	/**
-	 * Returns panel ID
-	 * @return string
-	 */
-	public function getId()
-	{
-		return __CLASS__;
-	}
-
-
-	/**
 	 * Renders HTML code for custom tab
 	 * @return string
 	 */
