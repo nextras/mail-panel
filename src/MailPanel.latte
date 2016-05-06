@@ -100,7 +100,8 @@
 
 				<tr class="nextras-mail-panel-preview-html tracy-collapsed">
 					<td colspan="2">
-						<iframe data-content="{include MailPanel.body.latte, message => $message|escape}"></iframe>
+						{capture $htmlPreview}{include MailPanel.body.latte, message => $message}{/capture}
+						<iframe data-content="{$htmlPreview}"></iframe>
 					</td>
 				</tr>
 			</table>
