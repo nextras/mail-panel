@@ -1,12 +1,21 @@
 <style>
-	#tracy-debug .tracy-panel .nextras-mail-panel.tracy-inner {
+	#tracy-debug .tracy-panel.tracy-mode-peek .nextras-mail-panel,
+	#tracy-debug .tracy-panel.tracy-mode-float .nextras-mail-panel {
 		overflow-y: scroll; /* reserve space for scrollbar */
+	}
+
+	#tracy-debug .tracy-panel.tracy-mode-peek .nextras-mail-panel table,
+	#tracy-debug .tracy-panel.tracy-mode-float .nextras-mail-panel table {
+		margin-right: 10px;
+		width: 600px;
+	}
+
+	#tracy-debug .tracy-panel.tracy-mode-window .nextras-mail-panel table {
+		width: 100%;
 	}
 
 	#tracy-debug .tracy-panel .nextras-mail-panel table {
 		margin-bottom: 10px;
-		margin-right: 10px;
-		width: 600px;
 	}
 
 	#tracy-debug .tracy-panel .nextras-mail-panel table:last-child {
