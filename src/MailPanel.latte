@@ -56,7 +56,7 @@
 		</table>
 
 		{foreach $messages as $messageId => $message}
-			<table>
+			<table class="nextras-mail-message">
 				<tr>
 					<th colspan="2">
 						<div class="nextras-mail-panel-actions">
@@ -99,10 +99,8 @@
 				</tr>
 
 				<tr class="nextras-mail-panel-preview-html tracy-collapsed">
-					<td colspan="2">
-						{capture $htmlPreview}{include MailPanel.body.latte, message => $message}{/capture}
-						<iframe data-content="{$htmlPreview}"></iframe>
-					</td>
+					{capture $htmlPreview}{include MailPanel.body.latte, message => $message}{/capture}
+					<td colspan="2" data-content="{$htmlPreview}"></td>
 				</tr>
 			</table>
 		{/foreach}
@@ -111,28 +109,42 @@
 			(function () {
 
 				var panel = document.getElementById('nextras-mail-panel-' + {$panelId});
-				var iframes = panel.getElementsByTagName('iframe');
+				var messages = panel.querySelectorAll('table.nextras-mail-message');
 
-				for (var i = 0; i < iframes.length; i++) {
-					(function (iframe) {
+				for (var i = 0; i < messages.length; i++) {
+					(function (message) {
 
-						iframe.contentWindow.document.write(iframe.dataset.content);
-						iframe.contentWindow.document.close();
-						delete iframe.dataset.content;
+						var actions = message.querySelector('.nextras-mail-panel-actions');
+						var preview = message.querySelector('.nextras-mail-panel-preview-html td');
 
-						var baseTag = iframe.contentWindow.document.createElement('base');
-						baseTag.target = '_parent';
-						iframe.contentWindow.document.body.appendChild(baseTag);
+						var initHtmlPreview = function () {
+							var iframe = document.createElement('iframe');
+							preview.appendChild(iframe);
 
-						var fixHeight = function () {
-							iframe.style.height = 0;
-							iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
-							iframe.contentWindow.removeEventListener('resize', fixHeight);
+							iframe.contentWindow.document.write(preview.dataset.content);
+							iframe.contentWindow.document.close();
+							delete preview.dataset.content;
+
+							var baseTag = iframe.contentWindow.document.createElement('base');
+							baseTag.target = '_parent';
+							iframe.contentWindow.document.body.appendChild(baseTag);
+
+							var fixHeight = function (ev) {
+								iframe.style.height = 0;
+								iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+								iframe.contentWindow.removeEventListener(ev.type, fixHeight);
+							};
+
+							iframe.contentWindow.addEventListener('load', fixHeight);
+							iframe.contentWindow.addEventListener('resize', fixHeight);
+							actions.removeEventListener('tracy-toggle', initHtmlPreview);
+							actions.removeEventListener('click', initHtmlPreview);
 						};
 
-						iframe.contentWindow.addEventListener('resize', fixHeight);
+						actions.addEventListener('tracy-toggle', initHtmlPreview);
+						actions.addEventListener('click', initHtmlPreview);
 
-					})(iframes.item(i));
+					})(messages.item(i));
 				}
 
 			})();
