@@ -23,7 +23,7 @@ use Tracy\IBarPanel;
 class MailPanel extends Object implements IBarPanel
 {
 	/** @const int */
-	const DEFAULT_COUNT = 5;
+	const DEFAULT_COUNT = 20;
 
 	/** @var Http\Request */
 	private $request;
