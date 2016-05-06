@@ -1,39 +1,39 @@
 <style>
-	#tracy-debug .tracy-panel[id$=MailPanel] .tracy-inner {
+	#tracy-debug .tracy-panel .nextras-mail-panel.tracy-inner {
 		overflow-y: scroll; /* reserve space for scrollbar */
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] table {
+	#tracy-debug .tracy-panel .nextras-mail-panel table {
 		margin-bottom: 10px;
 		margin-right: 10px;
 		width: 600px;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] table:last-child {
+	#tracy-debug .tracy-panel .nextras-mail-panel table:last-child {
 		margin-bottom: 0;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] th {
+	#tracy-debug .tracy-panel .nextras-mail-panel th {
 		width: 80px;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-actions {
+	#tracy-debug .tracy-panel .nextras-mail-panel-actions {
 		float: right;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-actions a {
+	#tracy-debug .tracy-panel .nextras-mail-panel-actions a {
 		margin-left: 7px;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-preview-txt td {
+	#tracy-debug .tracy-panel .nextras-mail-panel-preview-txt td {
 		white-space: pre;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-preview-html td {
+	#tracy-debug .tracy-panel .nextras-mail-panel-preview-html td {
 		padding: 0;
 	}
 
-	#tracy-debug .tracy-panel[id$=MailPanel] .nextras-mail-panel-preview-html iframe {
+	#tracy-debug .tracy-panel .nextras-mail-panel-preview-html iframe {
 		display: block;
 		width: 100%;
 		background: #FFF;
@@ -44,7 +44,7 @@
 
 {if count($messages) > 0}
 
-	<div class="tracy-inner" id="nextras-mail-panel-{$panelId}">
+	<div class="tracy-inner nextras-mail-panel" id="nextras-mail-panel-{$panelId}">
 		<table>
 			<tr>
 				<th colspan="2">
