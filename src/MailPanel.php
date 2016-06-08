@@ -10,6 +10,7 @@ namespace Nextras\MailPanel;
 
 use Latte;
 use Nette\Http;
+use Nette\Mail\IMailer;
 use Nette\Mail\MimePart;
 use Nette\Object;
 use Nette\Utils\Strings;
@@ -28,7 +29,7 @@ class MailPanel extends Object implements IBarPanel
 	/** @var Http\Request */
 	private $request;
 
-	/** @var IPersistentMailer */
+	/** @var IPersistentMailer|NULL */
 	private $mailer;
 
 	/** @var int */
@@ -42,13 +43,17 @@ class MailPanel extends Object implements IBarPanel
 
 
 	/**
-	 * @param string|NULL       $tempDir
-	 * @param Http\Request      $request
-	 * @param IPersistentMailer $mailer
-	 * @param int               $messagesLimit
+	 * @param string|NULL  $tempDir
+	 * @param Http\Request $request
+	 * @param IMailer      $mailer
+	 * @param int          $messagesLimit
 	 */
-	public function __construct($tempDir, Http\Request $request, IPersistentMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
+	public function __construct($tempDir, Http\Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
+		if (!$mailer instanceof IPersistentMailer) {
+			return;
+		}
+
 		$this->tempDir = $tempDir;
 		$this->request = $request;
 		$this->mailer = $mailer;
@@ -64,6 +69,10 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	public function getTab()
 	{
+		if ($this->mailer === NULL) {
+			return '';
+		}
+
 		$count = $this->mailer->getMessageCount();
 		$label = $count . ' sent email' . ($count === 1 ? '' : 's');
 
@@ -84,6 +93,10 @@ class MailPanel extends Object implements IBarPanel
 	 */
 	public function getPanel()
 	{
+		if ($this->mailer === NULL) {
+			return '';
+		}
+
 		return $this->getLatte()->renderToString(__DIR__ . '/MailPanel.latte', array(
 			'getLink' => array($this, 'getLink'),
 			'panelId' => substr(md5(uniqid('', TRUE)), 0, 6),

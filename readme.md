@@ -27,7 +27,9 @@ Nextras Mail Panel is an extension for [Nette Framework](https://nette.org) whic
 			- Nextras\MailPanel\MailPanel(%tempDir%/mail-panel-latte)
 
 	services:
-		nette.mailer: Nextras\MailPanel\FileMailer(%tempDir%/mail-panel-mails)
+		nette.mailer:
+			class: Nette\Mail\IMailer
+			factory: Nextras\MailPanel\FileMailer(%tempDir%/mail-panel-mails)
 	```
 
 
