@@ -26,7 +26,7 @@ class MailPanel extends Object implements IBarPanel
 	/** @const int */
 	const DEFAULT_COUNT = 20;
 
-	/** @var Http\Request */
+	/** @var Http\IRequest|Http\Request */
 	private $request;
 
 	/** @var IPersistentMailer|NULL */
@@ -44,11 +44,11 @@ class MailPanel extends Object implements IBarPanel
 
 	/**
 	 * @param string|NULL  $tempDir
-	 * @param Http\Request $request
+	 * @param Http\IRequest $request
 	 * @param IMailer      $mailer
 	 * @param int          $messagesLimit
 	 */
-	public function __construct($tempDir, Http\Request $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
+	public function __construct($tempDir, Http\IRequest $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
 	{
 		if (!$mailer instanceof IPersistentMailer) {
 			return;
