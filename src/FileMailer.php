@@ -9,7 +9,6 @@
 namespace Nextras\MailPanel;
 
 use Nette;
-use Nette\Object;
 use Nette\Utils\FileSystem;
 use Nette\Utils\Finder;
 use Nette\Mail\Message;
@@ -19,8 +18,10 @@ use Nette\Utils\Strings;
 /**
  * File mailer - emails are stored into files
  */
-class FileMailer extends Object implements IPersistentMailer
+class FileMailer implements IPersistentMailer
 {
+	use Nette\SmartObject;
+
 	/** @var string */
 	private $tempDir;
 
