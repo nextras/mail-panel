@@ -12,7 +12,6 @@ use Latte;
 use Nette\Http;
 use Nette\Mail\IMailer;
 use Nette\Mail\MimePart;
-use Nette\Object;
 use Nette\Utils\Strings;
 use Tracy\Debugger;
 use Tracy\IBarPanel;
@@ -21,8 +20,10 @@ use Tracy\IBarPanel;
 /**
  * Extension for Tracy bar which shows sent emails
  */
-class MailPanel extends Object implements IBarPanel
+class MailPanel implements IBarPanel
 {
+	use Nette\SmartObject;
+
 	/** @const int */
 	const DEFAULT_COUNT = 20;
 
