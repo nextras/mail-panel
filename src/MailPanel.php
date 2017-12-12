@@ -28,7 +28,7 @@ class MailPanel implements IBarPanel
 	/** @const int */
 	const DEFAULT_COUNT = 20;
 
-	/** @var Http\IRequest|Http\Request */
+	/** @var Http\IRequest */
 	private $request;
 
 	/** @var IPersistentMailer|NULL */
@@ -160,7 +160,7 @@ class MailPanel implements IBarPanel
 					foreach ($ref->getValue($queue[$i]) as $subPart) {
 						$contentType = $subPart->getHeader('Content-Type');
 						if (Strings::startsWith($contentType, 'text/plain') && $subPart->getHeader('Content-Transfer-Encoding') !== 'base64') { // Take first available plain text
-							return (string) $subPart->getBody();
+							return $subPart->getBody();
 						} elseif (Strings::startsWith($contentType, 'multipart/alternative')) {
 							$queue[] = $subPart;
 						}
@@ -258,7 +258,7 @@ class MailPanel implements IBarPanel
 
 
 	/**
-	 * @param  int $id
+	 * @param  string $id
 	 * @return void
 	 */
 	private function handleDeleteOne($id)
@@ -284,12 +284,12 @@ class MailPanel implements IBarPanel
 	private function returnBack()
 	{
 		$currentUrl = $this->request->getUrl();
-		$refererUrl = $this->request->getReferer();
+		$refererUrl = $this->request->getHeader('referer');
 
 		if ($refererUrl === NULL) {
 			throw new \RuntimeException('Unable to redirect back because your browser did not send referrer');
 
-		} elseif ($refererUrl->isEqual($currentUrl)) {
+		} elseif ($currentUrl->isEqual($refererUrl)) {
 			throw new \RuntimeException('Unable to redirect back because it would create loop');
 		}
 
