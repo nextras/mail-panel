@@ -26,6 +26,10 @@
 		"latte/latte":  "~2.4",
 		"tracy/tracy":  "~2.4"
 	},
+	"require-dev": {
+		"phpstan/phpstan-shim": "~0.9.1",
+		"phpstan/phpstan-nette": "~0.9"
+	},
 	"extra": {
 		"branch-alias": {
 			"dev-master": "2.3-dev"
