@@ -27,6 +27,8 @@
 		"tracy/tracy":  "~2.4"
 	},
 	"require-dev": {
+		"mockery/mockery": "~0.9",
+		"nette/tester": "~2.0",
 		"phpstan/phpstan-shim": "~0.9.1",
 		"phpstan/phpstan-nette": "~0.9"
 	},
