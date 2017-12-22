@@ -48,7 +48,7 @@ class SessionMailer implements IPersistentMailer
 	 * @param  Message $message
 	 * @return void
 	 */
-	public function send(Message $message)
+	public function send(Message $message): void
 	{
 		// get message with generated html instead of set FileTemplate etc
 		$ref = new \ReflectionMethod('Nette\Mail\Message', 'build');

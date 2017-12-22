@@ -19,20 +19,21 @@
 		}
 	],
 	"require": {
-		"php": ">=5.6",
-		"nette/mail":   "~2.4",
-		"nette/utils":  "~2.4",
-		"nette/http":   "~2.4",
-		"latte/latte":  "~2.4",
+		"php": ">=7.1",
+		"nette/mail":   "~3.0",
+		"nette/utils":  "~3.0",
+		"nette/http":   "~3.0",
+		"latte/latte":  "~3.0",
 		"tracy/tracy":  "~2.4"
 	},
 	"require-dev": {
 		"phpstan/phpstan-shim": "~0.9.1",
 		"phpstan/phpstan-nette": "~0.9"
 	},
+	"minimum-stability": "dev",
 	"extra": {
 		"branch-alias": {
-			"dev-master": "2.3-dev"
+			"dev-master": "3.0-dev"
 		}
 	},
 	"autoload": {
