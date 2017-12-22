@@ -107,6 +107,7 @@ class FileMailer implements IPersistentMailer
 		}
 
 		FileSystem::delete($files[$messageId]);
+		$this->files = NULL;
 	}
 
 
@@ -118,6 +119,7 @@ class FileMailer implements IPersistentMailer
 		foreach ($this->findFiles() as $file) {
 			FileSystem::delete($file);
 		}
+		$this->files = NULL;
 	}
 
 
