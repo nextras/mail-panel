@@ -10,9 +10,7 @@ namespace Nextras\MailPanel;
 
 use Nette;
 use Nette\Utils\FileSystem;
-use Nette\Utils\Finder;
 use Nette\Mail\Message;
-use Nette\Utils\Strings;
 
 
 /**
