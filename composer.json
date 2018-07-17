@@ -24,7 +24,7 @@
 		"nette/utils":  "~3.0",
 		"nette/http":   "~3.0",
 		"latte/latte":  "~3.0",
-		"tracy/tracy":  "~3.0"
+		"tracy/tracy":  "dev-master"
 	},
 	"require-dev": {
 		"phpstan/phpstan-shim": "~0.9.1",
