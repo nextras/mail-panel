@@ -20,11 +20,11 @@
 	],
 	"require": {
 		"php": ">=7.1",
-		"nette/mail":   "~3.0",
-		"nette/utils":  "~3.0",
-		"nette/http":   "~3.0",
-		"latte/latte":  "~3.0",
-		"tracy/tracy":  "~2.5"
+		"nette/mail":   "^3.0@dev",
+		"nette/utils":  "^3.0@dev",
+		"nette/http":   "^3.0@dev",
+		"latte/latte":  "^3.0@dev",
+		"tracy/tracy":  "^3.0@dev"
 	},
 	"require-dev": {
 		"phpstan/phpstan-shim": "~0.9.1",
