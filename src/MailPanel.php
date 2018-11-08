@@ -69,7 +69,7 @@ class MailPanel implements IBarPanel
 	 * Renders HTML code for custom tab
 	 * @return string
 	 */
-	public function getTab(): ?string;
+	public function getTab(): ?string
 	{
 		if ($this->mailer === NULL) {
 			return '';
@@ -93,7 +93,7 @@ class MailPanel implements IBarPanel
 	/**
 	 * @inheritdoc
 	 */
-	public function getPanel(): ?string;
+	public function getPanel(): ?string
 	{
 		if ($this->mailer === NULL) {
 			return '';
