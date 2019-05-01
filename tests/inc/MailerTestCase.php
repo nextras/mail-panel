@@ -21,7 +21,7 @@ abstract class MailerTestCase extends TestCase
 		Assert::count(2, $mailer->getMessages(2));
 		Assert::count(3, $mailer->getMessages(3));
 
-		$deletedMessageId = array_keys($mailer->getMessages(2))[0];
+		$deletedMessageId = (string) array_keys($mailer->getMessages(2))[0];
 		$mailer->deleteOne($deletedMessageId);
 		Assert::same(2, $mailer->getMessageCount());
 
