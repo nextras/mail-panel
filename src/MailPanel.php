@@ -122,8 +122,11 @@ class MailPanel implements IBarPanel
 	{
 		if (!isset($this->latte)) {
 			$this->latte = new Latte\Engine();
-			$this->latte->setTempDirectory($this->tempDir);
 			$this->latte->setAutoRefresh(FALSE);
+
+			if ($this->tempDir !== NULL) {
+				$this->latte->setTempDirectory($this->tempDir);
+			}
 
 			$this->latte->onCompile[] = function (Latte\Engine $latte) {
 				$set = new Latte\Macros\MacroSet($latte->getCompiler());
@@ -192,6 +195,7 @@ class MailPanel implements IBarPanel
 
 	private function handleDetail(string $messageId): void
 	{
+		assert($this->mailer !== null);
 		$message = $this->mailer->getMessage($messageId);
 
 		header('Content-Type: text/html');
@@ -202,6 +206,7 @@ class MailPanel implements IBarPanel
 
 	private function handleSource(string $messageId): void
 	{
+		assert($this->mailer !== null);
 		$message = $this->mailer->getMessage($messageId);
 
 		header('Content-Type: text/plain');
@@ -212,6 +217,7 @@ class MailPanel implements IBarPanel
 
 	private function handleAttachment(string $messageId, int $attachmentId): void
 	{
+		assert($this->mailer !== null);
 		$attachments = $this->mailer->getMessage($messageId)->getAttachments();
 		if (!isset($attachments[$attachmentId])) {
 			return;
@@ -230,6 +236,7 @@ class MailPanel implements IBarPanel
 
 	private function handleDeleteOne(string $id): void
 	{
+		assert($this->mailer !== null);
 		$this->mailer->deleteOne($id);
 		$this->returnBack();
 	}
@@ -237,6 +244,7 @@ class MailPanel implements IBarPanel
 
 	private function handleDeleteAll(): void
 	{
+		assert($this->mailer !== null);
 		$this->mailer->deleteAll();
 		$this->returnBack();
 	}
