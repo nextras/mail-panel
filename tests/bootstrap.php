@@ -2,7 +2,8 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-const TEMP_DIR = __DIR__ . '/../temp';
-
 Tester\Environment::setup();
+
+define('TEMP_DIR', __DIR__ . '/tmp/' . getmypid());
+@mkdir(dirname(TEMP_DIR)); // @ - directory may already exist
 Tester\Helpers::purge(TEMP_DIR);
