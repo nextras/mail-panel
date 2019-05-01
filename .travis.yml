@@ -22,4 +22,5 @@ before_script:
   - if [ "$dependencies" = "highest" ]; then composer update --no-interaction; fi;
 
 script:
-  - vendor/bin/phpstan analyse --configuration phpstan.neon --level 6 src
+  - vendor/bin/phpstan analyse --configuration phpstan.neon --level 7 src
+  - vendor/bin/tester -C tests
