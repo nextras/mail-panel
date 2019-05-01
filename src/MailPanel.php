@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 /**
  * This file is part of the Nextras\MailPanel library.
@@ -43,6 +42,7 @@ class MailPanel implements IBarPanel
 
 	/** @var Latte\Engine */
 	private $latte;
+
 
 	public function __construct(?string $tempDir, Http\IRequest $request, IMailer $mailer, int $messagesLimit = self::DEFAULT_COUNT)
 	{
@@ -92,11 +92,11 @@ class MailPanel implements IBarPanel
 			return '';
 		}
 
-		return $this->getLatte()->renderToString(__DIR__ . '/MailPanel.latte', array(
-			'getLink' => array($this, 'getLink'),
+		return $this->getLatte()->renderToString(__DIR__ . '/MailPanel.latte', [
+			'getLink' => [$this, 'getLink'],
 			'panelId' => substr(md5(uniqid('', TRUE)), 0, 6),
 			'messages' => $this->mailer->getMessages($this->messagesLimit),
-		));
+		]);
 	}
 
 
@@ -108,8 +108,8 @@ class MailPanel implements IBarPanel
 		$url = $this->request->getUrl();
 		$baseUrl = substr($url->getPath(), strrpos($url->getScriptPath(), '/') + 1);
 
-		$params = array('action' => $action) + $params;
-		$query = array();
+		$params = ['action' => $action] + $params;
+		$query = [];
 		foreach ($params as $key => $value) {
 			$query["nextras-mail-panel-$key"] = $value;
 		}
@@ -141,7 +141,7 @@ class MailPanel implements IBarPanel
 				$ref = new \ReflectionProperty('Nette\Mail\MimePart', 'parts');
 				$ref->setAccessible(TRUE);
 
-				$queue = array($part);
+				$queue = [$part];
 				for ($i = 0; $i < count($queue); $i++) {
 					/** @var MimePart $subPart */
 					foreach ($ref->getValue($queue[$i]) as $subPart) {
@@ -195,7 +195,7 @@ class MailPanel implements IBarPanel
 		$message = $this->mailer->getMessage($messageId);
 
 		header('Content-Type: text/html');
-		$this->getLatte()->render(__DIR__ . '/MailPanel.body.latte', array('message' => $message));
+		$this->getLatte()->render(__DIR__ . '/MailPanel.body.latte', ['message' => $message]);
 		exit;
 	}
 

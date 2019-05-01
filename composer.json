@@ -39,5 +39,10 @@
 	},
 	"autoload": {
 		"psr-4": { "Nextras\\MailPanel\\": "src/" }
+	},
+	"autoload-dev": {
+		"classmap": [
+			"tests/inc"
+		]
 	}
 }

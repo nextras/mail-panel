@@ -1,37 +1,31 @@
-<?php
+<?php declare(strict_types = 1);
 
+use Nette\Http\Session;
+use Nextras\MailPanel\IPersistentMailer;
 use Nextras\MailPanel\SessionMailer;
 
 require __DIR__ . '/bootstrap.php';
-require_once __DIR__ . '/MailerTestCase.php';
 
-/**
- * Class SessionMailerTest
- *
- * @testCase SessionMailer
- */
+
 class SessionMailerTest extends MailerTestCase
 {
+	public function createMailerInstance(): IPersistentMailer
+	{
+		return new SessionMailer($this->createSession());
+	}
 
-    /**
-     * @return \Nextras\MailPanel\IPersistentMailer
-     */
-    public function createMailerInstance()
-    {
-        return new SessionMailer($this->createSession());
-    }
 
-    private function createSession()
-    {
-        $sessionSection = Mockery::mock('alias:Nette\Http\SessionSection');
+	private function createSession(): Session
+	{
+		$sessionSection = Mockery::mock('alias:Nette\Http\SessionSection');
 
-        $session = Mockery::mock('Nette\Http\Session');
-        $session->shouldReceive('getSection')->andReturn($sessionSection);
-        $session->shouldReceive('getId')->andReturn('session_id_1');
-        $session->shouldReceive('isStarted')->andReturn(true);
+		$session = Mockery::mock('Nette\Http\Session');
+		$session->shouldReceive('getSection')->andReturn($sessionSection);
+		$session->shouldReceive('getId')->andReturn('session_id_1');
+		$session->shouldReceive('isStarted')->andReturn(true);
 
-        return $session;
-    }
+		return $session;
+	}
 }
 
 (new SessionMailerTest)->run();

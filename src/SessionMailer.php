@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 /**
  * This file is part of the Nextras\MailPanel library.
@@ -41,7 +40,7 @@ class SessionMailer implements IPersistentMailer
 	/**
 	 * Store mails to sessions.
 	 */
-	public function send(Message $message) : void
+	public function send(Message $message): void
 	{
 		// get message with generated html instead of set FileTemplate etc
 		$ref = new \ReflectionMethod('Nette\Mail\Message', 'build');
@@ -53,7 +52,7 @@ class SessionMailer implements IPersistentMailer
 		$this->requireSessions();
 		$hash = substr(md5($builtMessage->getHeader('Message-ID')), 0, 6);
 		$this->sessionSection->messages = array_slice(
-			array($hash => $builtMessage) + $this->sessionSection->messages,
+			[$hash => $builtMessage] + $this->sessionSection->messages,
 			0, $this->limit, TRUE
 		);
 	}
@@ -93,7 +92,7 @@ class SessionMailer implements IPersistentMailer
 			return array_slice($messages, 0, $limit, TRUE);
 
 		} else {
-			return array();
+			return [];
 		}
 	}
 
@@ -117,7 +116,7 @@ class SessionMailer implements IPersistentMailer
 	 */
 	public function deleteAll(): void
 	{
-		$this->sessionSection->messages = array();
+		$this->sessionSection->messages = [];
 	}
 
 
@@ -137,7 +136,7 @@ class SessionMailer implements IPersistentMailer
 		}
 
 		if (!isset($this->sessionSection->messages)) {
-			$this->sessionSection->messages = array();
+			$this->sessionSection->messages = [];
 		}
 	}
 }

@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 /**
  * This file is part of the Nextras\MailPanel library.
@@ -83,7 +82,7 @@ class FileMailer implements IPersistentMailer
 	public function getMessages(int $limit): array
 	{
 		$files = array_slice($this->findFiles(), 0, $limit, TRUE);
-		$mails = array_map(array($this, 'readMail'), $files);
+		$mails = array_map([$this, 'readMail'], $files);
 
 		return $mails;
 	}
@@ -122,7 +121,7 @@ class FileMailer implements IPersistentMailer
 	private function findFiles(): array
 	{
 		if ($this->files === NULL) {
-			$this->files = array();
+			$this->files = [];
 			foreach (glob("{$this->tempDir}/*.mail") as $file) {
 				$messageId = substr($file, -11, 6);
 				$this->files[$messageId] = $file;
