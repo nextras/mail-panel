@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * This file is part of the Nextras\MailPanel library.
@@ -43,14 +44,7 @@ class MailPanel implements IBarPanel
 	/** @var Latte\Engine */
 	private $latte;
 
-
-	/**
-	 * @param string|NULL  $tempDir
-	 * @param Http\IRequest $request
-	 * @param IMailer      $mailer
-	 * @param int          $messagesLimit
-	 */
-	public function __construct($tempDir, Http\IRequest $request, IMailer $mailer, $messagesLimit = self::DEFAULT_COUNT)
+	public function __construct(?string $tempDir, Http\IRequest $request, IMailer $mailer, int $messagesLimit = self::DEFAULT_COUNT)
 	{
 		if (!$mailer instanceof IPersistentMailer) {
 			return;
@@ -67,9 +61,8 @@ class MailPanel implements IBarPanel
 
 	/**
 	 * Renders HTML code for custom tab
-	 * @return string
 	 */
-	public function getTab()
+	public function getTab(): string
 	{
 		if ($this->mailer === NULL) {
 			return '';
@@ -93,7 +86,7 @@ class MailPanel implements IBarPanel
 	/**
 	 * @inheritdoc
 	 */
-	public function getPanel()
+	public function getPanel(): string
 	{
 		if ($this->mailer === NULL) {
 			return '';
@@ -109,11 +102,8 @@ class MailPanel implements IBarPanel
 
 	/**
 	 * Run-time link helper
-	 * @param  string $action
-	 * @param  array  $params
-	 * @return string
 	 */
-	public function getLink($action, array $params)
+	public function getLink(string $action, array $params): string
 	{
 		$url = $this->request->getUrl();
 		$baseUrl = substr($url->getPath(), strrpos($url->getScriptPath(), '/') + 1);
@@ -128,10 +118,7 @@ class MailPanel implements IBarPanel
 	}
 
 
-	/**
-	 * @return Latte\Engine
-	 */
-	private function getLatte()
+	private function getLatte(): Latte\Engine
 	{
 		if (!isset($this->latte)) {
 			$this->latte = new Latte\Engine();
@@ -175,10 +162,7 @@ class MailPanel implements IBarPanel
 	}
 
 
-	/**
-	 * @return void
-	 */
-	private function tryHandleRequest()
+	private function tryHandleRequest(): void
 	{
 		if (Debugger::$productionMode !== FALSE) {
 			return;
@@ -206,11 +190,7 @@ class MailPanel implements IBarPanel
 	}
 
 
-	/**
-	 * @param  string $messageId
-	 * @return void
-	 */
-	private function handleDetail($messageId)
+	private function handleDetail(string $messageId): void
 	{
 		$message = $this->mailer->getMessage($messageId);
 
@@ -220,11 +200,7 @@ class MailPanel implements IBarPanel
 	}
 
 
-	/**
-	 * @param  string $messageId
-	 * @return void
-	 */
-	private function handleSource($messageId)
+	private function handleSource(string $messageId): void
 	{
 		$message = $this->mailer->getMessage($messageId);
 
@@ -234,12 +210,7 @@ class MailPanel implements IBarPanel
 	}
 
 
-	/**
-	 * @param  string $messageId
-	 * @param  int    $attachmentId
-	 * @return void
-	 */
-	private function handleAttachment($messageId, $attachmentId)
+	private function handleAttachment(string $messageId, int $attachmentId): void
 	{
 		$attachments = $this->mailer->getMessage($messageId)->getAttachments();
 		if (!isset($attachments[$attachmentId])) {
@@ -257,31 +228,21 @@ class MailPanel implements IBarPanel
 	}
 
 
-	/**
-	 * @param  string $id
-	 * @return void
-	 */
-	private function handleDeleteOne($id)
+	private function handleDeleteOne(string $id): void
 	{
 		$this->mailer->deleteOne($id);
 		$this->returnBack();
 	}
 
 
-	/**
-	 * @return void
-	 */
-	private function handleDeleteAll()
+	private function handleDeleteAll(): void
 	{
 		$this->mailer->deleteAll();
 		$this->returnBack();
 	}
 
 
-	/**
-	 * @return void
-	 */
-	private function returnBack()
+	private function returnBack(): void
 	{
 		$currentUrl = $this->request->getUrl();
 		$refererUrl = $this->request->getHeader('referer');

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * This file is part of the Nextras\MailPanel library.
@@ -29,12 +30,7 @@ class SessionMailer implements IPersistentMailer
 	private $sessionSection;
 
 
-	/**
-	 * @param Session $session
-	 * @param int     $limit
-	 * @param string  $sectionName
-	 */
-	public function __construct(Session $session, $limit = 100, $sectionName = __CLASS__)
+	public function __construct(Session $session, int $limit = 100, string $sectionName = __CLASS__)
 	{
 		$this->limit = $limit;
 		$this->session = $session;
@@ -44,11 +40,8 @@ class SessionMailer implements IPersistentMailer
 
 	/**
 	 * Store mails to sessions.
-	 *
-	 * @param  Message $message
-	 * @return void
 	 */
-	public function send(Message $message)
+	public function send(Message $message) : void
 	{
 		// get message with generated html instead of set FileTemplate etc
 		$ref = new \ReflectionMethod('Nette\Mail\Message', 'build');
@@ -69,7 +62,7 @@ class SessionMailer implements IPersistentMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function getMessageCount()
+	public function getMessageCount(): int
 	{
 		return count($this->getMessages());
 	}
@@ -78,7 +71,7 @@ class SessionMailer implements IPersistentMailer
 	/**
 	 * @inheritDoc
 	 */
-	public function getMessage($messageId)
+	public function getMessage(string $messageId): Message
 	{
 		$this->requireSessions();
 
@@ -93,7 +86,7 @@ class SessionMailer implements IPersistentMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function getMessages($limit = NULL)
+	public function getMessages(int $limit = NULL): array
 	{
 		if ($this->session->isStarted() && isset($this->sessionSection->messages)) {
 			$messages = $this->sessionSection->messages;
@@ -108,7 +101,7 @@ class SessionMailer implements IPersistentMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function deleteOne($messageId)
+	public function deleteOne(string $messageId): void
 	{
 		$this->requireSessions();
 		if (!isset($this->sessionSection->messages[$messageId])) {
@@ -122,7 +115,7 @@ class SessionMailer implements IPersistentMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function deleteAll()
+	public function deleteAll(): void
 	{
 		$this->sessionSection->messages = array();
 	}
@@ -130,18 +123,14 @@ class SessionMailer implements IPersistentMailer
 
 	/**
 	 * Return limit of stored mails
-	 * @return int
 	 */
-	public function getLimit()
+	public function getLimit(): int
 	{
 		return $this->limit;
 	}
 
 
-	/**
-	 * @return void
-	 */
-	private function requireSessions()
+	private function requireSessions(): void
 	{
 		if (!$this->session->isStarted()) {
 			throw new \RuntimeException('Session is not started, start session or use FileMailer instead.');

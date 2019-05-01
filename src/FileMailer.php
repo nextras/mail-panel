@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * This file is part of the Nextras\MailPanel library.
@@ -29,10 +30,7 @@ class FileMailer implements IPersistentMailer
 	private $files;
 
 
-	/**
-	 * @param string $tempDir
-	 */
-	public function __construct($tempDir)
+	public function __construct(string $tempDir)
 	{
 		$this->tempDir = $tempDir;
 	}
@@ -40,11 +38,8 @@ class FileMailer implements IPersistentMailer
 
 	/**
 	 * Stores mail to a file.
-	 *
-	 * @param  Message $message
-	 * @return void
 	 */
-	public function send(Message $message)
+	public function send(Message $message): void
 	{
 		// get message with generated html instead of set FileTemplate etc
 		$ref = new \ReflectionMethod('Nette\Mail\Message', 'build');
@@ -64,7 +59,7 @@ class FileMailer implements IPersistentMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function getMessageCount()
+	public function getMessageCount(): int
 	{
 		return count($this->findFiles());
 	}
@@ -73,7 +68,7 @@ class FileMailer implements IPersistentMailer
 	/**
 	 * @inheritDoc
 	 */
-	public function getMessage($messageId)
+	public function getMessage(string $messageId): Message
 	{
 		$files = $this->findFiles();
 		if (!isset($files[$messageId])) {
@@ -87,7 +82,7 @@ class FileMailer implements IPersistentMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function getMessages($limit)
+	public function getMessages(int $limit): array
 	{
 		$files = array_slice($this->findFiles(), 0, $limit, TRUE);
 		$mails = array_map(array($this, 'readMail'), $files);
@@ -99,7 +94,7 @@ class FileMailer implements IPersistentMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function deleteOne($messageId)
+	public function deleteOne(string $messageId): void
 	{
 		$files = $this->findFiles();
 		if (!isset($files[$messageId])) {
@@ -113,7 +108,7 @@ class FileMailer implements IPersistentMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function deleteAll()
+	public function deleteAll(): void
 	{
 		foreach ($this->findFiles() as $file) {
 			FileSystem::delete($file);
@@ -124,7 +119,7 @@ class FileMailer implements IPersistentMailer
 	/**
 	 * @return string[]
 	 */
-	private function findFiles()
+	private function findFiles(): array
 	{
 		if ($this->files === NULL) {
 			$this->files = array();
@@ -139,11 +134,7 @@ class FileMailer implements IPersistentMailer
 	}
 
 
-	/**
-	 * @param  string $path
-	 * @return Nette\Mail\Message
-	 */
-	private function readMail($path)
+	private function readMail(string $path): Message
 	{
 		$content = file_get_contents($path);
 		if ($content === FALSE) {

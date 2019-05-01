@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * This file is part of the Nextras\MailPanel library.
@@ -9,6 +10,7 @@
 namespace Nextras\MailPanel;
 
 use Nette;
+use Nette\Mail\Message;
 
 
 /**
@@ -16,35 +18,20 @@ use Nette;
  */
 interface IPersistentMailer extends Nette\Mail\IMailer
 {
-	/**
-	 * @return int
-	 */
-	public function getMessageCount();
+	public function getMessageCount(): int;
+
+
+	public function getMessage(string $messageId): Message;
 
 
 	/**
-	 * @param  string $messageId
-	 * @return Nette\Mail\Message
-	 */
-	public function getMessage($messageId);
-
-
-	/**
-	 * @param  int $limit
 	 * @return Nette\Mail\Message[]
 	 */
-	public function getMessages($limit);
+	public function getMessages(int $limit): array;
 
 
-	/**
-	 * @param  string $messageId
-	 * @return void
-	 */
-	public function deleteOne($messageId);
+	public function deleteOne(string $messageId): void;
 
 
-	/**
-	 * @return void
-	 */
-	public function deleteAll();
+	public function deleteAll(): void;
 }
