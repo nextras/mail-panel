@@ -182,7 +182,7 @@ class MailPanel implements IBarPanel
 			$this->handleSource($messageId);
 
 		} elseif ($action === 'attachment' && is_string($messageId) && ctype_digit($attachmentId)) {
-			$this->handleAttachment($messageId, $attachmentId);
+			$this->handleAttachment($messageId, (int) $attachmentId);
 
 		} elseif ($action === 'delete-one' && is_string($messageId)) {
 			$this->handleDeleteOne($messageId);
