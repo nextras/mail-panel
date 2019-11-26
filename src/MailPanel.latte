@@ -1,7 +1,8 @@
 <style>
-	#tracy-debug .tracy-panel.tracy-mode-peek .nextras-mail-panel,
+	#tracy-debug .tracy-panel.tracy-mode-peek .nextras-mail-panel.
 	#tracy-debug .tracy-panel.tracy-mode-float .nextras-mail-panel {
 		overflow-y: scroll; /* reserve space for scrollbar */
+		min-width: 700px;
 	}
 
 	#tracy-debug .tracy-panel.tracy-mode-peek .nextras-mail-panel table,
@@ -91,6 +92,11 @@
 					</tr>
 				{/foreach}
 
+				<tr>
+					<th>Date</th>
+					<td>{$message->getHeader('Date')}</td>
+				</tr>
+
 				{var $attachments = $message->getAttachments()}
 				<tr n:if="$attachments">
 					<th>Attachments</th>
@@ -140,7 +146,7 @@
 
 							var fixHeight = function (ev) {
 								iframe.style.height = 0;
-								iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+								iframe.style.height = (iframe.contentWindow.document.body.scrollHeight+20) + 'px';
 								iframe.contentWindow.removeEventListener(ev.type, fixHeight);
 							};
 

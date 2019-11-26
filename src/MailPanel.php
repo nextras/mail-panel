@@ -92,13 +92,45 @@ class MailPanel implements IBarPanel
 			return '';
 		}
 
+		$messages = $this->mailer->getMessages($this->messagesLimit);
+
+		foreach ($messages as $message) {
+			$this->prepareMessageImages($message);
+		}
+
 		return $this->getLatte()->renderToString(__DIR__ . '/MailPanel.latte', [
 			'getLink' => [$this, 'getLink'],
 			'panelId' => substr(md5(uniqid('', TRUE)), 0, 6),
-			'messages' => $this->mailer->getMessages($this->messagesLimit),
+			'messages' => $messages,
 		]);
 	}
 
+	/**
+	 * @param Nette\Mail\Message $message
+	 */
+	private function prepareMessageImages(&$message)
+	{
+		$ref = new \ReflectionProperty('Nette\Mail\Message', 'inlines');
+		$ref->setAccessible(TRUE);
+		/** @var MimePart[] $inlines */
+		$inlines = $ref->getValue($message);
+
+		$body = $message->getHtmlBody();
+
+		foreach ($inlines as $part) {
+			$type = $part->getHeader('Content-Type');
+			$data = $part->getBody();
+			$base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+			$body = str_replace(
+				'cid:' . substr($part->getHeader('Content-ID'), 1, -1),
+				$base64,
+				$body
+			);
+		}
+
+		$message->setHtmlBody($body);
+	}
 
 	/**
 	 * Run-time link helper
@@ -208,6 +240,8 @@ class MailPanel implements IBarPanel
 	{
 		assert($this->mailer !== null);
 		$message = $this->mailer->getMessage($messageId);
+
+		$this->prepareMessageImages($message);
 
 		header('Content-Type: text/plain');
 		echo $message->getEncodedMessage();

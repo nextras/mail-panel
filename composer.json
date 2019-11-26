@@ -1,5 +1,5 @@
 {
-	"name": "nextras/mail-panel",
+	"name": "adt/mail-panel",
 	"type": "library",
 	"description": "MailPanel is extension for Nette Framework which captures sent e-mails in development mode and shows them in debugger bar.",
 	"keywords": ["framework", "debugging", "mail", "mail panel", "mailpanel", "mailing"],
