@@ -1,2 +1,8 @@
-includes:
-	- vendor/phpstan/phpstan-nette/extension.neon
+parameters:
+	checkMissingIterableValueType: false
+
+	ignoreErrors:
+		-
+			message: "#^Access to an undefined property Nette\\\\Http\\\\SessionSection\\:\\:\\$messages\\.$#"
+			count: 6
+			path: src/SessionMailer.php
