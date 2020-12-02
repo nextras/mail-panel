@@ -63,7 +63,7 @@ class SessionMailer implements IPersistentMailer
 	 */
 	public function getMessageCount(): int
 	{
-		return count($this->getMessages());
+		return count($this->getMessages(PHP_INT_MAX));
 	}
 
 
@@ -85,7 +85,7 @@ class SessionMailer implements IPersistentMailer
 	/**
 	 * @inheritdoc
 	 */
-	public function getMessages(int $limit = NULL): array
+	public function getMessages(int $limit): array
 	{
 		if ($this->session->isStarted() && isset($this->sessionSection->messages)) {
 			$messages = $this->sessionSection->messages;

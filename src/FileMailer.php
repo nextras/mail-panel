@@ -42,7 +42,7 @@ class FileMailer implements IPersistentMailer
 		$ref = new \ReflectionMethod('Nette\Mail\Message', 'build');
 		$ref->setAccessible(TRUE);
 
-		/** @var Message $builtMail */
+		/** @var Message */
 		$builtMessage = $ref->invoke($message);
 
 		$time = date('YmdHis');
@@ -122,7 +122,7 @@ class FileMailer implements IPersistentMailer
 	{
 		if ($this->files === NULL) {
 			$this->files = [];
-			foreach (glob("{$this->tempDir}/*.mail") as $file) {
+			foreach (glob("{$this->tempDir}/*.mail") ?: [] as $file) {
 				$messageId = substr($file, -11, 6);
 				$this->files[$messageId] = $file;
 			}
