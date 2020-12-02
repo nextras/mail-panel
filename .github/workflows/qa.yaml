@@ -1,0 +1,32 @@
+name: QA
+
+on:
+  pull_request:
+    branches:
+      - master
+
+  push:
+    branches:
+      - master
+      - v*
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.1', '7.2', '7.3', '7.4', '8.0']
+        dependencies: ['--prefer-lowest', '']
+
+    name: PHP ${{ matrix.php }} ${{ matrix.dependencies }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: json, mbstring, tokenizer
+          coverage: none
+
+      - run: composer update --no-progress ${{ matrix.dependecies }}
+      - run: vendor/bin/phpstan analyse --configuration phpstan.neon --level max src
+      - run: vendor/bin/tester -C tests
