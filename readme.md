@@ -28,19 +28,19 @@ Nextras Mail Panel is an extension for [Nette Framework](https://nette.org) whic
 
 	services:
 		nette.mailer:
-			class: Nette\Mail\IMailer
+			class: Nette\Mail\Mailer
 			factory: Nextras\MailPanel\FileMailer(%tempDir%/mail-panel-mails)
 	```
 
 
 ### Usage
 
-Messages has to be sent by injected instance of `Nette\Mail\IMailer`.
+Messages has to be sent by injected instance of `Nette\Mail\Mailer`.
 
 ```php
 class ExamplePresenter extends BasePresenter
 {
-	/** @var Nette\Mail\IMailer @inject */
+	/** @var Nette\Mail\Mailer @inject */
 	public $mailer;
 
 

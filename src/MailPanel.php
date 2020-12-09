@@ -11,7 +11,7 @@ namespace Nextras\MailPanel;
 use Latte;
 use Nette;
 use Nette\Http;
-use Nette\Mail\IMailer;
+use Nette\Mail\Mailer;
 use Nette\Mail\MimePart;
 use Nette\Utils\Strings;
 use Tracy\Debugger;
@@ -44,7 +44,7 @@ class MailPanel implements IBarPanel
 	private $latte;
 
 
-	public function __construct(?string $tempDir, Http\IRequest $request, IMailer $mailer, int $messagesLimit = self::DEFAULT_COUNT)
+	public function __construct(?string $tempDir, Http\IRequest $request, Mailer $mailer, int $messagesLimit = self::DEFAULT_COUNT)
 	{
 		if (!$mailer instanceof IPersistentMailer) {
 			return;
