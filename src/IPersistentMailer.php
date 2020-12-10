@@ -15,7 +15,7 @@ use Nette\Mail\Message;
 /**
  * Mailer which persists sent mails.
  */
-interface IPersistentMailer extends Nette\Mail\IMailer
+interface IPersistentMailer extends Nette\Mail\Mailer
 {
 	public function getMessageCount(): int;
 
