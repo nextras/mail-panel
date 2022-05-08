@@ -23,7 +23,7 @@
 		"nette/mail":   "~3.1",
 		"nette/utils":  "~3.0",
 		"nette/http":   "~3.0",
-		"latte/latte":  "~2.5",
+		"latte/latte":  "~2.5 || ~3.0",
 		"tracy/tracy":  "~2.4"
 	},
 	"require-dev": {
