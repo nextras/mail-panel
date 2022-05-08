@@ -128,10 +128,29 @@ class MailPanel implements IBarPanel
 				$this->latte->setTempDirectory($this->tempDir);
 			}
 
-			$this->latte->onCompile[] = function (Latte\Engine $latte) {
-				$set = new Latte\Macros\MacroSet($latte->getCompiler());
-				$set->addMacro('link', 'echo %escape(call_user_func($getLink, %node.word, %node.array))');
-			};
+			if (version_compare(Latte\Engine::VERSION, '3', '<')) {
+				$this->latte->onCompile[] = function (Latte\Engine $latte) {
+					$set = new Latte\Macros\MacroSet($latte->getCompiler());
+					$set->addMacro('link', 'echo %escape(call_user_func($getLink, %node.word, %node.array))');
+				};
+
+			} else {
+				$this->latte->addExtension(new class extends Latte\Extension {
+					public function getTags(): array
+					{
+						return ['link' => function (Latte\Compiler\Tag $tag) {
+							$dest = $tag->parser->parseUnquotedStringOrExpression();
+							$tag->parser->stream->tryConsume(',');
+							$args = $tag->parser->parseArguments();
+							return new Latte\Compiler\Nodes\AuxiliaryNode(
+								function (Latte\Compiler\PrintContext $context) use ($dest, $args) {
+									$context->format('echo %escape(call_user_func($getLink, %raw, %raw));', $dest, $args);
+								}
+							);
+						}];
+					}
+				});
+			}
 
 			$this->latte->addFilter('attachmentLabel', function (MimePart $attachment) {
 				$contentDisposition = $attachment->getHeader('Content-Disposition');
