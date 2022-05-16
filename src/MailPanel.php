@@ -144,7 +144,7 @@ class MailPanel implements IBarPanel
 							$args = $tag->parser->parseArguments();
 							return new Latte\Compiler\Nodes\AuxiliaryNode(
 								function (Latte\Compiler\PrintContext $context) use ($dest, $args) {
-									$context->format('echo %escape(call_user_func($getLink, %raw, %raw));', $dest, $args);
+									return $context->format('echo %escape(call_user_func($getLink, %node, %node));', $dest, $args);
 								}
 							);
 						}];
