@@ -93,7 +93,6 @@ class MailPanel implements IBarPanel
 		}
 
 		return $this->getLatte()->renderToString(__DIR__ . '/MailPanel.latte', [
-			'getLink' => [$this, 'getLink'],
 			'panelId' => substr(md5(uniqid('', TRUE)), 0, 6),
 			'messages' => $this->mailer->getMessages($this->messagesLimit),
 		]);
@@ -128,10 +127,7 @@ class MailPanel implements IBarPanel
 				$this->latte->setTempDirectory($this->tempDir);
 			}
 
-			$this->latte->onCompile[] = function (Latte\Engine $latte) {
-				$set = new Latte\Macros\MacroSet($latte->getCompiler());
-				$set->addMacro('link', 'echo %escape(call_user_func($getLink, %node.word, %node.array))');
-			};
+			$this->latte->addFunction('link', [$this, 'getLink']);
 
 			$this->latte->addFilter('attachmentLabel', function (MimePart $attachment) {
 				$contentDisposition = $attachment->getHeader('Content-Disposition');
