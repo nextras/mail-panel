@@ -58,7 +58,7 @@
 			<tr>
 				<th colspan="2">
 					<div class="nextras-mail-panel-actions">
-						<a href="{link delete-all}">Delete all</a>
+						<a href="{link('delete-all')}">Delete all</a>
 					</div>
 				</th>
 			</tr>
@@ -71,9 +71,9 @@
 						<div class="nextras-mail-panel-actions">
 							<a class="tracy-toggle tracy-collapsed" data-tracy-ref="^table .nextras-mail-panel-preview-txt">Preview TXT</a>
 							<a class="tracy-toggle tracy-collapsed" data-tracy-ref="^table .nextras-mail-panel-preview-html">Preview HTML</a>
-							<a target="_blank" href="{link detail, message-id => $messageId}">Open</a>
-							<a target="_blank" href="{link source, message-id => $messageId}">Source</a>
-							<a href="{link delete-one, message-id => $messageId}">Delete</a>
+							<a target="_blank" href="{link('detail', ['message-id' => $messageId])}">Open</a>
+							<a target="_blank" href="{link('source', ['message-id' => $messageId])}">Source</a>
+							<a href="{link('delete-one', ['message-id' => $messageId])}">Delete</a>
 						</div>
 						<div class="nextras-mail-panel-subject" title="Sent at {$message->getHeader('Date')}">{$message->subject}</div>
 					</th>
@@ -96,7 +96,7 @@
 					<th>Attachments</th>
 					<td>
 						{foreach $attachments as $attachmentId => $attachment}
-							<a target="_blank" href="{link attachment, message-id => $messageId, attachment-id => $attachmentId}">{$attachment|attachmentLabel}</a>
+							<a target="_blank" href="{link('attachment', ['message-id' => $messageId, 'attachment-id' => $attachmentId])}">{$attachment|attachmentLabel}</a>
 							{sep}<br>{/sep}
 						{/foreach}
 					</td>
