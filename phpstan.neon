@@ -1,9 +1,3 @@
 parameters:
 	level: 8
 	paths: [src]
-
-	ignoreErrors:
-		-
-			message: "#^Access to an undefined property Nette\\\\Http\\\\SessionSection\\:\\:\\$messages\\.$#"
-			count: 6
-			path: src/SessionMailer.php
