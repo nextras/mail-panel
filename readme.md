@@ -21,7 +21,7 @@ Nextras Mail Panel is an extension for [Nette Framework](https://nette.org) whic
 
 2. Update your local configuration (e.g. `config.local.neon`) to register Mail Panel to Tracy<br>and to change default mailer to `Nextras\MailPanel\FileMailer`.
 
-	```yml
+	```neon
 	tracy:
 		bar:
 			- Nextras\MailPanel\MailPanel(%tempDir%/mail-panel-latte)
