@@ -53,18 +53,12 @@ class FileMailer implements IPersistentMailer
 	}
 
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getMessageCount(): int
 	{
 		return count($this->findFiles());
 	}
 
 
-	/**
-	 * @inheritDoc
-	 */
 	public function getMessage(string $messageId): Message
 	{
 		$files = $this->findFiles();
@@ -76,9 +70,6 @@ class FileMailer implements IPersistentMailer
 	}
 
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getMessages(int $limit): array
 	{
 		$files = array_slice($this->findFiles(), 0, $limit, TRUE);
@@ -88,9 +79,6 @@ class FileMailer implements IPersistentMailer
 	}
 
 
-	/**
-	 * @inheritdoc
-	 */
 	public function deleteOne(string $messageId): void
 	{
 		$files = $this->findFiles();
@@ -103,9 +91,6 @@ class FileMailer implements IPersistentMailer
 	}
 
 
-	/**
-	 * @inheritdoc
-	 */
 	public function deleteAll(): void
 	{
 		foreach ($this->findFiles() as $file) {

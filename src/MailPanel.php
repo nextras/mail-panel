@@ -83,9 +83,6 @@ class MailPanel implements IBarPanel
 	}
 
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getPanel(): string
 	{
 		if ($this->mailer === NULL) {
