@@ -64,7 +64,7 @@ class MailPanel implements IBarPanel
 	 */
 	public function getTab(): string
 	{
-		if ($this->mailer === NULL) {
+		if ($this->mailer === null) {
 			return '';
 		}
 
@@ -73,11 +73,11 @@ class MailPanel implements IBarPanel
 
 		return '<span title="Mail Panel">' .
 			'<svg viewBox="0 0 16 16">' .
-  			'	<rect x="0" y="2" width="16" height="11" rx="1" ry="1" fill="#588ac8"/>' .
-  			'	<rect x="1" y="3" width="14" height="9" fill="#eef3f8"/>' .
-  			'	<rect x="2" y="4" width="12" height="7" fill="#dcebfe"/>' .
-  			'	<path d="M 2 11 l 4 -4 q 2 -2 4 0 l 4 4" stroke="#bbccdd" fill="none"/>' .
-  			'	<path d="M 2 4 l 4 4 q 2 2 4 0 l 4 -4" stroke="#85aae2" fill="#dee8f7"/>' .
+			'	<rect x="0" y="2" width="16" height="11" rx="1" ry="1" fill="#588ac8"/>' .
+			'	<rect x="1" y="3" width="14" height="9" fill="#eef3f8"/>' .
+			'	<rect x="2" y="4" width="12" height="7" fill="#dcebfe"/>' .
+			'	<path d="M 2 11 l 4 -4 q 2 -2 4 0 l 4 4" stroke="#bbccdd" fill="none"/>' .
+			'	<path d="M 2 4 l 4 4 q 2 2 4 0 l 4 -4" stroke="#85aae2" fill="#dee8f7"/>' .
 			'</svg>' .
 			'<span class="tracy-label">' . $label . '</span></span>';
 	}
@@ -85,12 +85,12 @@ class MailPanel implements IBarPanel
 
 	public function getPanel(): string
 	{
-		if ($this->mailer === NULL) {
+		if ($this->mailer === null) {
 			return '';
 		}
 
 		return $this->getLatte()->renderToString(__DIR__ . '/MailPanel.latte', [
-			'panelId' => substr(md5(uniqid('', TRUE)), 0, 6),
+			'panelId' => substr(md5(uniqid('', true)), 0, 6),
 			'messages' => $this->mailer->getMessages($this->messagesLimit),
 		]);
 	}
@@ -117,11 +117,11 @@ class MailPanel implements IBarPanel
 
 	private function getLatte(): Latte\Engine
 	{
-		if ($this->latte === NULL) {
+		if ($this->latte === null) {
 			$this->latte = new Latte\Engine();
-			$this->latte->setAutoRefresh(FALSE);
+			$this->latte->setAutoRefresh(false);
 
-			if ($this->tempDir !== NULL) {
+			if ($this->tempDir !== null) {
 				$this->latte->setTempDirectory($this->tempDir);
 			}
 
@@ -136,7 +136,7 @@ class MailPanel implements IBarPanel
 
 			$this->latte->addFilter('plainText', function (MimePart $part) {
 				$ref = new \ReflectionProperty('Nette\Mail\MimePart', 'parts');
-				$ref->setAccessible(TRUE);
+				$ref->setAccessible(true);
 
 				$queue = [$part];
 				for ($i = 0; $i < count($queue); $i++) {
@@ -161,7 +161,7 @@ class MailPanel implements IBarPanel
 
 	private function tryHandleRequest(): void
 	{
-		if (Debugger::$productionMode !== FALSE) {
+		if (Debugger::$productionMode !== false) {
 			return;
 		}
 
@@ -249,7 +249,7 @@ class MailPanel implements IBarPanel
 		$currentUrl = $this->request->getUrl();
 		$refererUrl = $this->request->getHeader('referer');
 
-		if ($refererUrl === NULL) {
+		if ($refererUrl === null) {
 			throw new \RuntimeException('Unable to redirect back because your browser did not send referrer');
 
 		} elseif ($currentUrl->isEqual($refererUrl)) {

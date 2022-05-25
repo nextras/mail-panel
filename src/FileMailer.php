@@ -9,8 +9,8 @@
 namespace Nextras\MailPanel;
 
 use Nette;
-use Nette\Utils\FileSystem;
 use Nette\Mail\Message;
+use Nette\Utils\FileSystem;
 
 
 /**
@@ -40,7 +40,7 @@ class FileMailer implements IPersistentMailer
 	{
 		// get message with generated html instead of set FileTemplate etc
 		$ref = new \ReflectionMethod('Nette\Mail\Message', 'build');
-		$ref->setAccessible(TRUE);
+		$ref->setAccessible(true);
 
 		/** @var Message */
 		$builtMessage = $ref->invoke($message);
@@ -49,7 +49,7 @@ class FileMailer implements IPersistentMailer
 		$hash = substr(md5($builtMessage->getHeader('Message-ID')), 0, 6);
 		$path = "{$this->tempDir}/{$time}-{$hash}.mail";
 		FileSystem::write($path, serialize($builtMessage));
-		$this->files = NULL;
+		$this->files = null;
 	}
 
 
@@ -72,7 +72,7 @@ class FileMailer implements IPersistentMailer
 
 	public function getMessages(int $limit): array
 	{
-		$files = array_slice($this->findFiles(), 0, $limit, TRUE);
+		$files = array_slice($this->findFiles(), 0, $limit, true);
 		$mails = array_map([$this, 'readMail'], $files);
 
 		return $mails;
@@ -87,7 +87,7 @@ class FileMailer implements IPersistentMailer
 		}
 
 		FileSystem::delete($files[$messageId]);
-		$this->files = NULL;
+		$this->files = null;
 	}
 
 
@@ -96,7 +96,7 @@ class FileMailer implements IPersistentMailer
 		foreach ($this->findFiles() as $file) {
 			FileSystem::delete($file);
 		}
-		$this->files = NULL;
+		$this->files = null;
 	}
 
 
@@ -105,7 +105,7 @@ class FileMailer implements IPersistentMailer
 	 */
 	private function findFiles(): array
 	{
-		if ($this->files === NULL) {
+		if ($this->files === null) {
 			$this->files = [];
 			foreach (glob("{$this->tempDir}/*.mail") ?: [] as $file) {
 				$messageId = substr($file, -11, 6);
@@ -121,7 +121,7 @@ class FileMailer implements IPersistentMailer
 	private function readMail(string $path): Message
 	{
 		$content = file_get_contents($path);
-		if ($content === FALSE) {
+		if ($content === false) {
 			throw new \RuntimeException("Unable to read message stored in file '$path'");
 		}
 
