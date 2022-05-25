@@ -40,7 +40,7 @@ class MailPanel implements IBarPanel
 	/** @var string|NULL */
 	private $tempDir;
 
-	/** @var Latte\Engine */
+	/** @var Latte\Engine|NULL */
 	private $latte;
 
 
@@ -101,6 +101,7 @@ class MailPanel implements IBarPanel
 
 	/**
 	 * Run-time link helper
+	 * @param array<string, string> $params
 	 */
 	public function getLink(string $action, array $params): string
 	{
@@ -119,7 +120,7 @@ class MailPanel implements IBarPanel
 
 	private function getLatte(): Latte\Engine
 	{
-		if (!isset($this->latte)) {
+		if ($this->latte === NULL) {
 			$this->latte = new Latte\Engine();
 			$this->latte->setAutoRefresh(FALSE);
 

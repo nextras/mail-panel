@@ -28,5 +28,5 @@ jobs:
           coverage: none
 
       - run: composer update --no-progress ${{ matrix.dependecies }}
-      - run: vendor/bin/phpstan analyse --configuration phpstan.neon --level max src
+      - run: vendor/bin/phpstan analyse
       - run: vendor/bin/tester -C tests
