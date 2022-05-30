@@ -100,7 +100,7 @@ class MailPanel implements IBarPanel
 	 * Run-time link helper
 	 * @param array<string, string> $params
 	 */
-	public function getLink(string $action, array $params): string
+	public function getLink(string $action, array $params = []): string
 	{
 		$url = $this->request->getUrl();
 		$baseUrl = substr($url->getPath(), strrpos($url->getScriptPath(), '/') + 1);
