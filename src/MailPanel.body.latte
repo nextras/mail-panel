@@ -1,5 +1,5 @@
 {* Little magic here. Create iframe and then render message into it (needed because HTML messages) *}
-{if $message->getHtmlBody() !== NULL}
+{if $message->getHtmlBody() !== ''}
 	{$message->getHtmlBody()|noescape}
 {else}
 	<!doctype html>
