@@ -136,7 +136,6 @@ class MailPanel implements IBarPanel
 
 			$this->latte->addFilter('plainText', function (MimePart $part) {
 				$ref = new \ReflectionProperty('Nette\Mail\MimePart', 'parts');
-				$ref->setAccessible(true);
 
 				$queue = [$part];
 				for ($i = 0; $i < count($queue); $i++) {
