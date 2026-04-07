@@ -108,7 +108,8 @@
 				</tr>
 
 				<tr class="nextras-mail-panel-preview-html tracy-collapsed">
-					<td colspan="2" data-content="{$message|previewHtml}"></td>
+					{capture $htmlPreview}{include MailPanel.body.latte, message => $message}{/capture}
+					<td colspan="2" data-content="{$htmlPreview}"></td>
 				</tr>
 			</table>
 		{/foreach}
