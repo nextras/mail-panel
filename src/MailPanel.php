@@ -12,6 +12,7 @@ use Latte;
 use Nette;
 use Nette\Http;
 use Nette\Mail\Mailer;
+use Nette\Mail\Message;
 use Nette\Mail\MimePart;
 use Nette\Utils\Strings;
 use Tracy\Debugger;
@@ -42,6 +43,9 @@ class MailPanel implements IBarPanel
 
 	/** @var Latte\Engine|NULL */
 	private $latte;
+
+	/** @var \ReflectionProperty|NULL */
+	private $mimePartPartsProperty;
 
 
 	public function __construct(?string $tempDir, Http\IRequest $request, Mailer $mailer, int $messagesLimit = self::DEFAULT_COUNT)
@@ -135,26 +139,94 @@ class MailPanel implements IBarPanel
 			});
 
 			$this->latte->addFilter('plainText', function (MimePart $part) {
-				$ref = new \ReflectionProperty('Nette\Mail\MimePart', 'parts');
-
-				$queue = [$part];
-				for ($i = 0; $i < count($queue); $i++) {
-					/** @var MimePart $subPart */
-					foreach ($ref->getValue($queue[$i]) as $subPart) {
-						$contentType = $subPart->getHeader('Content-Type');
-						if (Strings::startsWith($contentType, 'text/plain') && $subPart->getHeader('Content-Transfer-Encoding') !== 'base64') { // Take first available plain text
-							return $subPart->getBody();
-						} elseif (Strings::startsWith($contentType, 'multipart/alternative')) {
-							$queue[] = $subPart;
-						}
-					}
+				$plainText = $this->findBodyByContentType($part, 'text/plain');
+				if ($plainText !== null) {
+					return $plainText;
 				}
 
-				return $part->getBody();
+				return $this->decodeBody($part);
+			});
+
+			$this->latte->addFilter('previewHtml', function (MimePart $part): string {
+				$htmlBody = $this->extractHtmlBody($part);
+				if ($htmlBody !== '') {
+					return $htmlBody;
+				}
+
+				$plainText = $this->findBodyByContentType($part, 'text/plain') ?? $this->decodeBody($part);
+				return '<!doctype html>'
+					. '<meta charset="utf-8">'
+					. '<style>html,body{margin:0;padding:0;border:none;font-family:sans-serif;font-size:12px;white-space:pre;}body{padding:10px;}</style>'
+					. '<body>' . htmlspecialchars($plainText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</body>';
 			});
 		}
 
 		return $this->latte;
+	}
+
+
+	private function extractHtmlBody(MimePart $part): string
+	{
+		if ($part instanceof Message && $part->getHtmlBody() !== '') {
+			return $part->getHtmlBody();
+		}
+
+		return $this->findBodyByContentType($part, 'text/html') ?? '';
+	}
+
+
+	private function findBodyByContentType(MimePart $part, string $contentTypePrefix): ?string
+	{
+		$queue = [$part];
+		for ($i = 0; $i < count($queue); $i++) {
+			$currentPart = $queue[$i];
+			$contentType = $currentPart->getHeader('Content-Type');
+			if (is_string($contentType) && Strings::startsWith(strtolower($contentType), $contentTypePrefix)) {
+				return $this->decodeBody($currentPart);
+			}
+
+			/** @var MimePart $subPart */
+			foreach ($this->getMimePartParts($currentPart) as $subPart) {
+				$queue[] = $subPart;
+			}
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return MimePart[]
+	 */
+	private function getMimePartParts(MimePart $part): array
+	{
+		if ($this->mimePartPartsProperty === null) {
+			$this->mimePartPartsProperty = new \ReflectionProperty(MimePart::class, 'parts');
+			if (PHP_VERSION_ID < 80100) {
+				$this->mimePartPartsProperty->setAccessible(true);
+			}
+		}
+
+		$parts = $this->mimePartPartsProperty->getValue($part);
+		return is_array($parts) ? $parts : [];
+	}
+
+
+	private function decodeBody(MimePart $part): string
+	{
+		$body = $part->getBody();
+		$transferEncoding = strtolower((string) $part->getHeader('Content-Transfer-Encoding'));
+
+		if ($transferEncoding === MimePart::EncodingQuotedPrintable) {
+			return quoted_printable_decode($body);
+		}
+
+		if ($transferEncoding === MimePart::EncodingBase64) {
+			$decodedBody = base64_decode($body, true);
+			return is_string($decodedBody) ? $decodedBody : $body;
+		}
+
+		return $body;
 	}
 
 
