@@ -108,7 +108,7 @@
 				</tr>
 
 				<tr class="nextras-mail-panel-preview-html tracy-collapsed">
-					<td colspan="2" data-content="{$message|previewHtml}"></td>
+					<td colspan="2" data-src="{link('preview', ['message-id' => $messageId])}"></td>
 				</tr>
 			</table>
 		{/foreach}
@@ -129,22 +129,18 @@
 							var iframe = document.createElement('iframe');
 							preview.appendChild(iframe);
 
-							iframe.contentWindow.document.write(preview.dataset.content);
-							iframe.contentWindow.document.close();
-							delete preview.dataset.content;
-
-							var baseTag = iframe.contentWindow.document.createElement('base');
-							baseTag.target = '_parent';
-							iframe.contentWindow.document.body.appendChild(baseTag);
-
 							var fixHeight = function (ev) {
+								var iframeDocument = iframe.contentWindow.document;
+								var iframeBody = iframeDocument.body || iframeDocument.documentElement;
 								iframe.style.height = 0;
-								iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+								iframe.style.height = iframeBody.scrollHeight + 'px';
 								iframe.contentWindow.removeEventListener(ev.type, fixHeight);
 							};
 
 							iframe.contentWindow.addEventListener('load', fixHeight);
 							iframe.contentWindow.addEventListener('resize', fixHeight);
+							iframe.src = preview.dataset.src;
+							delete preview.dataset.src;
 							actions.removeEventListener('tracy-toggle', initHtmlPreview);
 							actions.removeEventListener('click', initHtmlPreview);
 						};

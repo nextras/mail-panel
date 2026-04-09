@@ -33,7 +33,7 @@ class MailPanelTest extends TestCase
 	}
 
 
-	public function testPanelStoresEscapedHtmlPreviewInDataAttribute(): void
+	public function testPanelStoresPreviewEndpointInDataAttribute(): void
 	{
 		$message = (new Message())
 			->setSubject('Panel preview')
@@ -42,9 +42,8 @@ class MailPanelTest extends TestCase
 		$panel = $this->createPanel(new ArrayPersistentMailer(['message-id' => $message]));
 		$output = $panel->getPanel();
 
-		Assert::contains('data-content="&lt;h1&gt;Hello from HTML&lt;/h1&gt;"', $output);
+		Assert::contains('data-src="index.php?nextras-mail-panel-action=preview&amp;nextras-mail-panel-message-id=message-id"', $output);
 	}
-
 
 	private function renderMessageBody(Message $message): string
 	{
