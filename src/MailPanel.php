@@ -304,6 +304,10 @@ class MailPanel implements IBarPanel
 	{
 		$baseTag = '<base target="_parent">';
 
+		if (preg_match('~<base(?:\s[^>]*)?>~i', $html) === 1) {
+			return $html;
+		}
+
 		if (preg_match('~<head(?:\s[^>]*)?>~i', $html, $match, PREG_OFFSET_CAPTURE) === 1) {
 			$headTag = $match[0][0];
 			$position = $match[0][1] + strlen($headTag);
