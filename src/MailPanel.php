@@ -240,7 +240,10 @@ class MailPanel implements IBarPanel
 		$messageId = $this->request->getQuery('nextras-mail-panel-message-id');
 		$attachmentId = $this->request->getQuery('nextras-mail-panel-attachment-id');
 
-		if ($action === 'detail' && is_string($messageId)) {
+		if ($action === 'preview' && is_string($messageId)) {
+			$this->handlePreview($messageId);
+
+		} elseif ($action === 'detail' && is_string($messageId)) {
 			$this->handleDetail($messageId);
 
 		} elseif ($action === 'source' && is_string($messageId)) {
@@ -264,7 +267,18 @@ class MailPanel implements IBarPanel
 		$message = $this->mailer->getMessage($messageId);
 
 		header('Content-Type: text/html');
-		$this->getLatte()->render(__DIR__ . '/MailPanel.body.latte', ['message' => $message]);
+		echo $this->renderMessagePreview($message);
+		exit;
+	}
+
+
+	private function handlePreview(string $messageId): void
+	{
+		assert($this->mailer !== null);
+		$message = $this->mailer->getMessage($messageId);
+
+		header('Content-Type: text/html');
+		echo $this->addParentBaseTarget($this->renderMessagePreview($message));
 		exit;
 	}
 
@@ -277,6 +291,32 @@ class MailPanel implements IBarPanel
 		header('Content-Type: text/plain');
 		echo $message->getEncodedMessage();
 		exit;
+	}
+
+
+	private function renderMessagePreview(MimePart $message): string
+	{
+		return $this->getLatte()->renderToString(__DIR__ . '/MailPanel.body.latte', ['message' => $message]);
+	}
+
+
+	private function addParentBaseTarget(string $html): string
+	{
+		$baseTag = '<base target="_parent">';
+
+		if (preg_match('~<head(?:\s[^>]*)?>~i', $html, $match, PREG_OFFSET_CAPTURE) === 1) {
+			$headTag = $match[0][0];
+			$position = $match[0][1] + strlen($headTag);
+			return substr($html, 0, $position) . $baseTag . substr($html, $position);
+		}
+
+		if (preg_match('~<html(?:\s[^>]*)?>~i', $html, $match, PREG_OFFSET_CAPTURE) === 1) {
+			$htmlTag = $match[0][0];
+			$position = $match[0][1] + strlen($htmlTag);
+			return substr($html, 0, $position) . '<head>' . $baseTag . '</head>' . substr($html, $position);
+		}
+
+		return '<!doctype html><html><head>' . $baseTag . '</head><body>' . $html . '</body></html>';
 	}
 
 
