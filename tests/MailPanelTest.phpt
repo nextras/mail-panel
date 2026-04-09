@@ -45,6 +45,19 @@ class MailPanelTest extends TestCase
 		Assert::contains('data-src="index.php?nextras-mail-panel-action=preview&amp;nextras-mail-panel-message-id=message-id"', $output);
 	}
 
+
+	public function testPreviewPreservesExistingBaseTag(): void
+	{
+		$message = (new Message())
+			->setSubject('Panel preview')
+			->setHtmlBody('<!doctype html><html><head><base href="https://example.com/assets/"><style>body{color:#000;}</style></head><body><img src="logo.png"></body></html>');
+
+		$output = $this->renderPreviewHtml($message);
+
+		Assert::contains('<base href="https://example.com/assets/">', $output);
+		Assert::notContains('<base target="_parent">', $output);
+	}
+
 	private function renderMessageBody(Message $message): string
 	{
 		$panel = $this->createPanel(new NullPersistentMailer());
@@ -54,6 +67,19 @@ class MailPanelTest extends TestCase
 		$latte = $ref->invoke($panel);
 
 		return $latte->renderToString(__DIR__ . '/../src/MailPanel.body.latte', ['message' => $message]);
+	}
+
+
+	private function renderPreviewHtml(Message $message): string
+	{
+		$panel = $this->createPanel(new NullPersistentMailer());
+
+		$renderMessagePreview = new ReflectionMethod(MailPanel::class, 'renderMessagePreview');
+		$renderMessagePreview->setAccessible(true);
+		$addParentBaseTarget = new ReflectionMethod(MailPanel::class, 'addParentBaseTarget');
+		$addParentBaseTarget->setAccessible(true);
+
+		return $addParentBaseTarget->invoke($panel, $renderMessagePreview->invoke($panel, $message));
 	}
 
 
