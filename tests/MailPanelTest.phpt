@@ -51,7 +51,9 @@ class MailPanelTest extends TestCase
 		$panel = $this->createPanel(new NullPersistentMailer());
 
 		$ref = new ReflectionMethod(MailPanel::class, 'getLatte');
-		$ref->setAccessible(true);
+		if (PHP_VERSION_ID < 80100) {
+			$ref->setAccessible(true);
+		}
 		$latte = $ref->invoke($panel);
 
 		return $latte->renderToString(__DIR__ . '/../src/MailPanel.body.latte', ['message' => $message]);

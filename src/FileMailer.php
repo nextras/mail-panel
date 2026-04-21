@@ -40,7 +40,9 @@ class FileMailer implements IPersistentMailer
 	{
 		// get message with generated html instead of set FileTemplate etc
 		$ref = new \ReflectionMethod('Nette\Mail\Message', 'build');
-		$ref->setAccessible(true);
+		if (PHP_VERSION_ID < 80100) {
+			$ref->setAccessible(true);
+		}
 
 		/** @var Message */
 		$builtMessage = $ref->invoke($message);
