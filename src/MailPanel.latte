@@ -108,56 +108,12 @@
 				</tr>
 
 				<tr class="nextras-mail-panel-preview-html tracy-collapsed">
-					{capture $htmlPreview}{include MailPanel.body.latte, message => $message}{/capture}
-					<td colspan="2" data-content="{$htmlPreview}"></td>
+					<td colspan="2">
+						<iframe srcdoc="{$message->getHtmlBody()}"></iframe>
+					</td>
 				</tr>
 			</table>
 		{/foreach}
-
-		<script>
-			(function () {
-
-				var panel = document.getElementById('nextras-mail-panel-' + {$panelId});
-				var messages = panel.querySelectorAll('table.nextras-mail-message');
-
-				for (var i = 0; i < messages.length; i++) {
-					(function (message) {
-
-						var actions = message.querySelector('.nextras-mail-panel-actions');
-						var preview = message.querySelector('.nextras-mail-panel-preview-html td');
-
-						var initHtmlPreview = function () {
-							var iframe = document.createElement('iframe');
-							preview.appendChild(iframe);
-
-							iframe.contentWindow.document.write(preview.dataset.content);
-							iframe.contentWindow.document.close();
-							delete preview.dataset.content;
-
-							var baseTag = iframe.contentWindow.document.createElement('base');
-							baseTag.target = '_parent';
-							iframe.contentWindow.document.body.appendChild(baseTag);
-
-							var fixHeight = function (ev) {
-								iframe.style.height = 0;
-								iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
-								iframe.contentWindow.removeEventListener(ev.type, fixHeight);
-							};
-
-							iframe.contentWindow.addEventListener('load', fixHeight);
-							iframe.contentWindow.addEventListener('resize', fixHeight);
-							actions.removeEventListener('tracy-toggle', initHtmlPreview);
-							actions.removeEventListener('click', initHtmlPreview);
-						};
-
-						actions.addEventListener('tracy-toggle', initHtmlPreview);
-						actions.addEventListener('click', initHtmlPreview);
-
-					})(messages.item(i));
-				}
-
-			})();
-		</script>
 	</div>
 {else}
 	<p>No emails.</p>
