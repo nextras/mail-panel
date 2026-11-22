@@ -109,7 +109,7 @@
 
 				<tr class="nextras-mail-panel-preview-html tracy-collapsed">
 					<td colspan="2">
-						<iframe srcdoc="{$message->getHtmlBody()}"></iframe>
+						<iframe srcdoc="{$message->getHtmlBody()|noescape}"></iframe>
 					</td>
 				</tr>
 			</table>
